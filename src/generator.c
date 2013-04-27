@@ -79,6 +79,12 @@ static PointStack *build_stack(const size_t capacity)
     return stack;
 }
 
+static void destory_stack(PointStack * const stack)
+{
+    free(stack->data);
+    free(stack);
+}
+
 static void push(PointStack * const stack, const Point point)
 {
     size_t top = stack->top_index;
@@ -124,6 +130,14 @@ static void render_maze( const Dir * const grid
                        , const size_t map_height
                        );
 
+static void fill_grid( Dir * const grid
+                     , const size_t gird_width
+                     , const size_t grid_height 
+                     , const TileType * const map_data
+                     , const size_t width
+                     , const size_t height
+                     );
+
 void fill_with_maze( TileType * const map_data
                    , const size_t width
                    , const size_t height
@@ -137,6 +151,21 @@ void fill_with_maze( TileType * const map_data
     for (int i = 0; i < grid_size.x * grid_size.y; i++) {
         grid[i] = 0;
     }
+    
+    fill_grid  (grid, grid_size.x, grid_size.y, map_data, width, height);
+    
+    render_maze(grid, grid_size.x, grid_size.y, map_data, width, height);
+}
+
+static void fill_grid( Dir * const grid
+                     , const size_t grid_width
+                     , const size_t grid_height 
+                     , const TileType * const map_data
+                     , const size_t width
+                     , const size_t height
+                     )
+{
+    const Point grid_size = {grid_width, grid_height};
 
     Dir directions[] = {DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT};
     PointStack *active_cells = build_stack(grid_size.x * grid_size.y);
@@ -182,55 +211,8 @@ void fill_with_maze( TileType * const map_data
 
 #undef GRID_AT
 
-    render_maze(grid, grid_size.x, grid_size.y, map_data, width, height);
+    destory_stack(active_cells);
 }
-
-//  /** @return {Array.<Cell>} */
-//  function mazeChunkBuilder() {
-//    var gridWidth  = (((C.CHUNK_WIDTH) / 2) | 0);
-//    var gridHeight = (((C.CHUNK_HEIGHT) / 2) | 0);
-//  
-//    var grid = new Array(gridWidth);
-//    for (var i = 0; i < gridWidth; i++) {
-//      grid[i] = new Array(gridHeight);
-//      for (var j = 0; j < gridWidth; j++) {
-//        grid[i][j] = 0;
-//      }
-//    }
-//  
-//    var directions = [DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT];
-//    var activeCells = new Array();
-//    var _x = ((Math.random() * gridWidth)  | 0)
-//    var _y = ((Math.random() * gridHeight) | 0)
-//    activeCells.push({x: _x, y: _y});
-//  
-//    while (activeCells.length > 0) {
-//      var inactivate = true;
-//      var cell = activeCells[activeCells.length - 1];
-//      _x = cell.x; _y = cell.y; 
-//      directions = shuffle(directions);
-//  
-//      for (var key in directions) {
-//        var dir = directions[key];
-//        var nx = (_x + dir.vector.x) | 0;
-//        var ny = (_y + dir.vector.y) | 0;
-//  
-//        if (   nx >= 0 && nx < gridWidth
-//            && ny >= 0 && ny < gridHeight
-//            && grid[nx][ny] == 0) {
-//          grid[_x][_y] |= dir.flag;
-//          grid[nx][ny] |= opposite(dir.flag);
-//          activeCells.push({x: nx, y: ny});
-//          inactivate = false;
-//          break;
-//        }
-//      }
-//  
-//      if (inactivate) activeCells.pop();
-//    }
-//  
-//    return renderMaze(grid, gridWidth, gridHeight);
-//  }
 
 static void render_maze( const Dir * const grid
                        , const size_t grid_width
@@ -268,43 +250,3 @@ static void render_maze( const Dir * const grid
 
 }
 
-//  /** @return {Array.<Cell>} */
-//  function renderMaze(grid, gridWidth, gridHeight) {
-//    
-//    /* turn grid into tiles: */
-//    for (var i = 0; i < gridWidth; i++) {
-//      for (var j = 0; j < gridHeight; j++) {
-//        var dir = grid[i][j];
-//        data[i * 2][j * 2].height = 0;
-//        if ((dir & DIR_DOWN.flag) == 0)
-//          data[i * 2 + 1][j * 2].height = 0;
-//        if ((dir & DIR_LEFT.flag) == 0)
-//          data[i * 2][j * 2 + 1].height = 0;
-//        if (   dir === DIR_LEFT.flag || dir === DIR_RIGHT.flag
-//            || dir === DIR_DOWN.flag || dir === DIR_UP.flag) {
-//          data[i * 2 + 1][j * 2 + 1].feature = 1;
-//        }
-//      }
-//    }
-//    /* add entry and exit: */
-//    for (var i = 0; i < C.CHUNK_WIDTH - 1; i++) {
-//      data[i][C.CHUNK_HALF_HEIGHT].height = 1;
-//      if (data[i + 1][C.CHUNK_HALF_HEIGHT].height > 0)
-//        break;
-//      if (data[i][C.CHUNK_HALF_HEIGHT + 1].height > 0)
-//        break;
-//      if (data[i][C.CHUNK_HALF_HEIGHT - 1].height > 0)
-//        break;
-//    }
-//    for (var i = C.CHUNK_WIDTH - 1; i > 0; i--) {
-//      data[i][C.CHUNK_HALF_HEIGHT].height = 1;
-//      if (data[i - 1][C.CHUNK_HALF_HEIGHT].height > 0)
-//        break;
-//      if (data[i][C.CHUNK_HALF_HEIGHT + 1].height > 0)
-//        break;
-//      if (data[i][C.CHUNK_HALF_HEIGHT - 1].height > 0)
-//        break;
-//    }
-//  
-//    return data;
-//  }
