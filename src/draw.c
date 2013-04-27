@@ -25,9 +25,14 @@ void draw( const State * const state
             Uint32 *texture = NULL;
             if (current_tile == 1) {
                 texture = assets->wall_tex;
+            } else if (current_tile == 2) {
+                texture = assets->trap_tex;
             } else {
                 texture = assets->floor_tex;
             }
+
+            if (x == state->player_pos.x && y == state->player_pos.y)
+                texture = assets->player_tex;
 
             if (texture == NULL) 
                 continue;

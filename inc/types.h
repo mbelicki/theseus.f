@@ -34,4 +34,6 @@ typedef struct _Assets {
 
     Uint32 *wall_tex;
     Uint32 *floor_tex;
+    Uint32 *trap_tex;
+    Uint32 *player_tex;
 } Assets;
