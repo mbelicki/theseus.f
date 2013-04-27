@@ -228,7 +228,7 @@ static void render_maze( const Dir * const grid
 
 #define MAP_AT(x, y) \
     (map_data[(x) + map_width * (y)])    
-    /* top, left borders and inside */   
+    /* insides */   
     for (int i = 0; i < grid_width; i++) {
         for (int j = 0; j < grid_height; j++) {
             Dir dir = grid[i + grid_width * j];
@@ -236,11 +236,11 @@ static void render_maze( const Dir * const grid
             MAP_AT(i * 2, j * 2) = TILE_WALL;
             if ((dir & DIR_DOWN) == 0)
                 MAP_AT(i * 2 + 1, j * 2)
-                    = rand() % 64 == 0 ? TILE_TRAP : TILE_WALL;
+                    = rand() % 8 == 0 ? TILE_TRAP : TILE_WALL;
             
             if ((dir & DIR_LEFT) == 0)
                 MAP_AT(i * 2, j * 2 + 1)
-                    = rand() % 64 == 0 ? TILE_TRAP : TILE_WALL;
+                    = rand() % 8 == 0 ? TILE_TRAP : TILE_WALL;
             
             if (   dir == DIR_LEFT || dir == DIR_RIGHT
                 || dir == DIR_DOWN || dir == DIR_UP) {
@@ -248,13 +248,13 @@ static void render_maze( const Dir * const grid
             }
         }
     }
-    /* bottom border */
+    /* top & bottom border */
     for (int i = 0; i < map_width; i++) {
-        MAP_AT(i, map_height - 1) = TILE_WALL;
+        MAP_AT(i, map_height - 1) = MAP_AT(i, 0) = TILE_WALL;
     }
-    /* right border */
+    /* left $ right border */
     for (int j = 0; j < map_height; j++) {
-        MAP_AT(map_width -1, j) = TILE_WALL;
+        MAP_AT(map_width -1, j) = MAP_AT(0, j) = TILE_WALL;
     }
 #undef MAP_AT
 

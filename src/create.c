@@ -105,6 +105,7 @@ SDL_Surface *load_image(const char * const name)
 {
     SDL_Surface *image = NULL;
     if((image = IMG_Load(name)) == NULL) {
+        printf("-> failed to load %s\n", name);
         return NULL;
     }
     return image;
@@ -121,7 +122,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->tex_height = 32;
 
     const size_t tex_size  = assets->tex_width * assets->tex_height;
-    const size_t tex_count = 5;
+    const size_t tex_count = 6;
 
     Uint32 *textures = malloc(sizeof(Uint32) * tex_count * tex_size);
     if (textures == NULL) {
@@ -134,6 +135,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->trap_tex   = textures + 2 * tex_size;
     assets->string_tex = textures + 3 * tex_size;
     assets->player_tex = textures + 4 * tex_size;
+    assets->enemy_tex  = textures + 5 * tex_size;
 
     assets->image_dangerous = load_image("gfx/dangerous.png");
 
@@ -178,6 +180,14 @@ Assets *load_assets(const SDL_Surface * const screen)
                    , floor_color
                    );
 
+    fill_player_tex( screen
+                   , assets->enemy_tex
+                   , assets->tex_width
+                   , assets->tex_height
+                   , trap_color
+                   , floor_color
+                   );
+
     return assets;
 }
 
@@ -188,14 +198,15 @@ State *create_initial_state()
 
     state->type = STATE_INTRO;
 
-    state->player_pos.x = 0;
+    state->player_pos.x = 1;
     state->player_pos.y = 8;
     state->player_goto = state->player_prev_pos = state->player_pos;
 
     state->player_move_delta = 0.0;
-    state->player_move_speed = 5.0;
+    state->player_move_speed = 7.0; /* in tiles per second */
     
     state->map_data = NULL;
+    state->map_enemies = malloc(sizeof(Enemy) * MAX_ENEMY_COUNT);
 
     return state;
 }

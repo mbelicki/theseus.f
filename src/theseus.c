@@ -32,19 +32,21 @@ static StateBehavior *get_behavior_table()
 
 int main(int argc, char **argv)
 {
-    double time    = 0;
-    int keys       = 0;
+    double time = 0;
+    int keys    = 0;
     
     unsigned long then = 0;
     unsigned long now  = 0;
     
     State       *state  = create_initial_state();
-    SDL_Surface *screen = get_screen(512, 512, "theseus");
+    SDL_Surface *screen = get_screen(512, 512, "theseus.f");
     Assets      *assets = load_assets(screen);
 
     if (screen == NULL || state == NULL || assets == NULL) {
         exit(1);
     }
+
+    srand(8);
 
     change_level(state, assets, 0);
     StateBehavior *behaviors = get_behavior_table();

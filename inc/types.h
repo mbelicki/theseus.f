@@ -12,12 +12,22 @@ typedef struct _Point {
     int y;
 } Point;
 
-typedef enum _TileType {
-    TILE_STRING = -2,
-    TILE_TRAP   = -1,
-    TILE_FLOOR  =  0,
-    TILE_WALL   =  1
-} TileType;
+typedef struct _Enemy {
+    Point  position;
+    Point  destination;
+    double movement_delta;
+    int    is_moving_horizontal;
+    int    is_going_back;
+} Enemy;
+
+#define ENEMY_SPEED 3.0
+#define MAX_ENEMY_COUNT 4
+
+typedef enum _TileType { TILE_STRING = -2
+                       , TILE_TRAP   = -1
+                       , TILE_FLOOR  =  0
+                       , TILE_WALL   =  1
+                       } TileType;
 
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
@@ -32,6 +42,8 @@ typedef struct _State {
     TileType *map_data;
     int       map_width;
     int       map_height;
+    Enemy    *map_enemies;
+    size_t    map_enemy_count;
 
     int current_level_no;
 
@@ -58,6 +70,7 @@ typedef struct _Assets {
     Uint32 *trap_tex;
     Uint32 *string_tex;
     Uint32 *player_tex;
+    Uint32 *enemy_tex;
 
     SDL_Surface *image_dangerous;
 } Assets;

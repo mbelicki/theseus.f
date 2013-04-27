@@ -2,6 +2,38 @@
 
 #include "draw.h"
 
+static void draw_enemy( Enemy * const enemy
+                      , SDL_Surface * const screen
+                      , const Assets * const assets
+                      , const Point tile_size
+                      )
+{
+    Uint32 *pixels = screen->pixels;
+    
+    const int off_x = tile_size.x / 2;
+    const int off_y = tile_size.y / 2;
+
+    const Point position    = enemy->position;
+    const Point destination = enemy->destination;
+    const double delta = (1 - enemy->movement_delta);
+    const int enemy_i
+        = (int)(tile_size.x * (position.x 
+                                + delta * (destination.x - position.x)));
+    const int enemy_j
+        = (int)(tile_size.y * (position.y 
+                                + delta * (destination.y - position.y)));
+    
+    for (int i = 0; i < assets->tex_width; i++) {
+        for (int j = 0; j < assets->tex_height; j++) {
+            const int x = enemy_i + i - off_x;
+            const int y = enemy_j + j - off_y;
+            pixels[x + screen->w * y]
+                = assets->enemy_tex[i + assets->tex_width * j];
+        }
+    }
+
+}
+
 static void draw_player( const State * const state
                        , SDL_Surface * const screen
                        , const Assets * const assets
@@ -12,7 +44,6 @@ static void draw_player( const State * const state
     
     const int off_x = tile_size.x / 2;
     const int off_y = tile_size.y / 2;
-
 
     const Point player_pos  = state->player_pos;
     const Point player_goto = state->player_goto;
@@ -26,8 +57,8 @@ static void draw_player( const State * const state
     
     for (int i = 0; i < assets->tex_width; i++) {
         for (int j = 0; j < assets->tex_height; j++) {
-            const int x = player_i + i - off_x;
-            const int y = player_j + j - off_y;
+            const size_t x = player_i + i - off_x;
+            const size_t y = player_j + j - off_y;
             pixels[x + screen->w * y]
                 = assets->player_tex[i + assets->tex_width * j];
         }
@@ -76,7 +107,9 @@ static void draw_image( SDL_Surface * const screen
                       , SDL_Surface * const image
                       )
 {
+    SDL_UnlockSurface(screen);
     SDL_BlitSurface(image, NULL, screen, NULL);
+    SDL_LockSurface(screen);
 }
 
 extern void draw_free( const State * const state   
