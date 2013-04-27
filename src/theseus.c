@@ -52,25 +52,67 @@ int is_not_done(void)
     return event.type != SDL_QUIT;
 }
 
+TileType destination_tile(const State * const state)
+{
+    return state->map_data[state->player_goto.x 
+                + state->map_width * state->player_goto.y];
+}
+
+TileType current_tile(const State * const state)
+{
+    return state->map_data[state->player_pos.x 
+                + state->map_width * state->player_pos.y];
+}
+
+void set_tile( State * const state
+             , const TileType t
+             , const int x
+             , const int y
+             )
+{
+    state->map_data[x + state->map_width * y] = t;
+}
+
 State *process( State * const state
               , const int new_keys
               , const int old_keys
               , const double time
               )
 {
-    if (state->player_move_delta == 0) {
+    if (state->player_move_delta == 0.0) {
         if (new_keys & KEY_UP) {
             state->player_goto.y -= 1;
+            state->player_move_delta = 1.0;
         } else if (new_keys & KEY_DOWN) {
             state->player_goto.y += 1;
+            state->player_move_delta = 1.0;
         } else if (new_keys & KEY_LEFT) {
             state->player_goto.x -= 1;
+            state->player_move_delta = 1.0;
         } else if (new_keys & KEY_RIGHT) {
             state->player_goto.x += 1;
+            state->player_move_delta = 1.0;
         }
-        state->player_move_delta = 1.0;
-    }
 
+        if ( state->player_move_delta == 1.0 ) {
+            int destination = destination_tile(state);
+            int current    = current_tile(state);
+
+            if (destination > 0) {
+                state->player_goto = state->player_pos;
+                state->player_move_delta = 0.0;
+            } else {
+                if (current == TILE_FLOOR && destination == TILE_FLOOR) {
+                    set_tile(state, TILE_STRING, 
+                             state->player_pos.x, state->player_pos.y);
+                } else if (current == TILE_STRING && destination == TILE_STRING) {
+                    set_tile(state, TILE_FLOOR, 
+                             state->player_pos.x, state->player_pos.y);
+                }
+            }
+        }
+    }
+    
     return state;
 }
 

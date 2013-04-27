@@ -76,7 +76,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->tex_height = 16;
 
     const size_t tex_size  = assets->tex_width * assets->tex_height;
-    const size_t tex_count = 4;
+    const size_t tex_count = 5;
 
     Uint32 *textures = malloc(sizeof(Uint32) * tex_count * tex_size);
     if (textures == NULL) {
@@ -87,11 +87,13 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->wall_tex   = textures;
     assets->floor_tex  = textures + tex_size;
     assets->trap_tex   = textures + 2 * tex_size;
-    assets->player_tex = textures + 3 * tex_size;
+    assets->string_tex = textures + 3 * tex_size;
+    assets->player_tex = textures + 4 * tex_size;
 
-    const Color wall_color  = {255,   0,   0,   0};
-    const Color floor_color = {255, 255, 255, 255};
-    const Color trap_color  = {255, 255,   0,   0};
+    const Color wall_color   = {255,   0,   0,   0};
+    const Color floor_color  = {255, 255, 255, 255};
+    const Color trap_color   = {255, 255,   0,   0};
+    const Color string_color = {255, 255, 255, 128};
 
     fill_wall_tex( screen
                  , assets->wall_tex
@@ -112,6 +114,13 @@ Assets *load_assets(const SDL_Surface * const screen)
                  , assets->tex_width
                  , assets->tex_height
                  , trap_color
+                 );
+
+    fill_wall_tex( screen
+                 , assets->string_tex
+                 , assets->tex_width
+                 , assets->tex_height
+                 , string_color
                  );
 
     fill_player_tex( screen
@@ -137,11 +146,11 @@ static void fill_map_data( int * const map_data
         }
     }
 
-    map_data[5 + width * 7] = 1;
-    map_data[6 + width * 7] = 1;
-    map_data[7 + width * 7] = 1;
-    map_data[7 + width * 8] = 1;
-    map_data[7 + width * 9] = 2;
+    map_data[5 + width * 7] = TILE_WALL;
+    map_data[6 + width * 7] = TILE_WALL;
+    map_data[7 + width * 7] = TILE_WALL;
+    map_data[7 + width * 8] = TILE_WALL;
+    map_data[7 + width * 9] = TILE_TRAP;
 }
 
 State *create_initial_state()

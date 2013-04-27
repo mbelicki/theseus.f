@@ -47,10 +47,12 @@ static void draw_map( const State * const state
             
             int current_tile = state->map_data[x + state->map_width * y];
             Uint32 *texture = NULL;
-            if (current_tile == 1) {
+            if (current_tile == TILE_WALL) {
                 texture = assets->wall_tex;
-            } else if (current_tile == 2) {
+            } else if (current_tile == TILE_TRAP) {
                 texture = assets->trap_tex;
+            } else if (current_tile == TILE_STRING) {
+                texture = assets->string_tex;
             } else {
                 texture = assets->floor_tex;
             }
