@@ -72,17 +72,18 @@ void change_level( State * const state
         free(state->map_data);
     }
         
-    state->map_width  = 16;
-    state->map_height = 16;
+    state->map_width  = 17;
+    state->map_height = 17;
     const int map_size = state->map_width * state->map_height;
 
     //state->map_data = malloc(sizeof(TileType) * map_size);
     //if (state->map_data == NULL) return;
     
-    if (level == 0) {
-        state->map_data = level_0;
-        state->map_is_dynamic = 0;
-    } else {
+    //if (level == 0) {
+    //    state->map_data = level_0;
+    //    state->map_is_dynamic = 0;
+    //} else {
+    {
         //state->map_data = level_1;
         //state->map_is_dynamic = 0;
         state->map_data = malloc(sizeof(TileType) * map_size);

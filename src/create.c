@@ -32,9 +32,43 @@ static void fill_wall_tex( const SDL_Surface * const context
                          , const Color base_color
                          )
 {
-    Uint32 color = INTIFY(base_color, context);
+    Uint32 base = INTIFY(base_color, context);
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
+            texture[i + width * j] = base;
+        }
+    }
+}
+
+static void fill_trap_tex( const SDL_Surface * const context
+                         , Uint32 * const texture
+                         , const int width
+                         , const int height
+                         , const Color base_color
+                         )
+{
+    const Color lighter_color
+        = {255, base_color.r + 30, base_color.g + 30, base_color.b + 30};
+
+    const Uint32 base    = INTIFY(base_color,    context);
+    const Uint32 lighter = INTIFY(lighter_color, context);
+
+    const int tooth_width  = width  / 4;
+    const int tooth_height = height / 2;
+
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            const int is_odd = (i / tooth_width) % 2;
+
+            const int ti = i % tooth_width;
+            const int tj = j % tooth_height;
+            
+            Uint32 color = lighter;
+            if (is_odd && tj > ti)
+                color = base;
+            if (!is_odd && (tj > (tooth_width - ti)))
+                color = base;
+
             texture[i + width * j] = color;
         }
     }
@@ -91,10 +125,10 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->string_tex = textures + 3 * tex_size;
     assets->player_tex = textures + 4 * tex_size;
 
-    const Color wall_color   = {255,   0,   0,   0};
-    const Color floor_color  = {255, 255, 255, 255};
-    const Color trap_color   = {255, 255,   0,   0};
-    const Color string_color = {255, 255, 255, 128};
+    const Color wall_color   = {255,  13,  51, 114};
+    const Color floor_color  = {255,  65, 113, 191};
+    const Color string_color = {255,  65, 187, 191};
+    const Color trap_color   = {255, 216,  67,  63};
 
     fill_wall_tex( screen
                  , assets->wall_tex
@@ -110,7 +144,7 @@ Assets *load_assets(const SDL_Surface * const screen)
                  , floor_color
                  );
 
-    fill_wall_tex( screen
+    fill_trap_tex( screen
                  , assets->trap_tex
                  , assets->tex_width
                  , assets->tex_height
