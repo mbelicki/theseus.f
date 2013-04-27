@@ -5,6 +5,7 @@
 #include "types.h"
 #include "create.h"
 #include "draw.h"
+#include "levels.h"
 
 int get_keyboard(void);
 State *process(State *state, int new_keys, int old_keys, double time);
@@ -24,6 +25,8 @@ int main(int argc, char **argv)
     SDL_Surface *screen = get_screen(512, 512, "theseus");
     Assets      *assets = load_assets(screen);
    
+    change_level(state, assets, 0);
+
     if (screen == NULL || state == NULL || assets == NULL) {
         exit(1);
     }

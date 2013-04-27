@@ -21,6 +21,7 @@ typedef enum _TileType {
 
 typedef struct _State {
 
+    int       map_is_dynamic;
     TileType *map_data;
     int       map_width;
     int       map_height;

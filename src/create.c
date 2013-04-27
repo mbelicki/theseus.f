@@ -1,6 +1,7 @@
 #include <SDL/SDL.h>
 
 #include "create.h"
+#include "levels.h"
 
 SDL_Surface *get_screen( const int width
                        , const int height
@@ -134,46 +135,6 @@ Assets *load_assets(const SDL_Surface * const screen)
     return assets;
 }
 
-static void fill_map_data( TileType * const map_data
-                         , const int width
-                         , const int height
-                         )
-{
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            map_data[i + width * j]
-                 = i == 0 || j == 0 || i == width - 1 || j == height - 1;
-        }
-    }
-
-    map_data[5 + width *  7] = TILE_WALL;
-    map_data[6 + width *  7] = TILE_WALL;
-    map_data[7 + width *  7] = TILE_WALL;
-    map_data[7 + width *  8] = TILE_WALL;
-    map_data[7 + width *  9] = TILE_TRAP;
-    map_data[7 + width * 10] = TILE_WALL;
-    map_data[7 + width * 12] = TILE_WALL;
-}
-
-static TileType level_0[] =
-    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
-    , 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1 
-    , 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 
-    , 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0 
-    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1 
-    , 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1 
-    , 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1 
-    , 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1 
-    , 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0,-1, 0, 1, 1 
-    , 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1 
-    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 
-    , 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1 
-    , 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 
-    , 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1 
-    , 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1 
-    , 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
-    };
-
 State *create_initial_state()
 {
     State *state = malloc(sizeof(State));
@@ -185,22 +146,8 @@ State *create_initial_state()
 
     state->player_move_delta = 0.0;
     state->player_move_speed = 5.0;
-
-    state->map_width  = 16;
-    state->map_height = 16;
-    const int map_size = state->map_width * state->map_height;
-
-    state->map_data = malloc(sizeof(TileType) * map_size);
-    if (state->map_data == NULL){
-        free(state);
-        return NULL;
-    }
-
-    fill_map_data( state->map_data
-                 , state->map_width
-                 , state->map_height
-                 );
-    state->map_data = level_0;
+    
+    state->map_data = NULL;
 
     return state;
 }
