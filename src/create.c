@@ -26,10 +26,43 @@ SDL_Surface *get_screen( const int width
 
 Assets *load_assets()
 {
-    return NULL;
+    Assets *assets = malloc(sizeof(Assets));
+    if (assets == NULL) return NULL;
+
+    return assets;
+}
+
+static void fill_map_data( int * const map_data
+                          , const int width
+                          , const int height
+                          )
+{
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            map_data[i + width * j] = 0;
+        }
+    }
 }
 
 State *create_initial_state()
 {
-    return NULL;
+    State *state = malloc(sizeof(State));
+    if (state == NULL) return NULL;
+
+    state->map_width  = 32;
+    state->map_height = 32;
+    const int map_size = state->map_width * state->map_height;
+
+    state->map_data = malloc(sizeof(int) * map_size);
+    if (state->map_data == NULL){
+        free(state);
+        return NULL;
+    }
+
+    fill_map_data( state->map_data
+                 , state->map_width
+                 , state->map_height
+                 );
+
+    return state;
 }

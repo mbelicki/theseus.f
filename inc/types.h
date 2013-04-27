@@ -6,7 +6,6 @@ typedef struct _Point {
 } Point;
 
 typedef struct _State {
-    
 
     int       *map_data;
     int        map_width;
@@ -23,5 +22,5 @@ typedef enum _Key {
 } Key;
 
 typedef struct _Assets {
-
+    int something_will_be_here_later;
 } Assets;
