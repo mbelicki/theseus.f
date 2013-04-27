@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     
     State       *state  = create_initial_state();
     SDL_Surface *screen = get_screen(512, 512, "theseus");
-    Assets      *assets = load_assets();
+    Assets      *assets = load_assets(screen);
    
     if (screen == NULL || state == NULL || assets == NULL) {
         exit(1);

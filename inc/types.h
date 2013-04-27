@@ -1,5 +1,8 @@
 #pragma once
 
+#define INTIFY(c,s) \
+    (SDL_MapRGB((s)->format, (c).r, (c).g, (c).b))
+
 typedef struct _Color {
     unsigned char a, r, g, b;
 } Color;
@@ -26,5 +29,9 @@ typedef enum _Key {
 } Key;
 
 typedef struct _Assets {
-    int something_will_be_here_later;
+    int tex_width;
+    int tex_height;
+
+    Uint32 *wall_tex;
+    Uint32 *floor_tex;
 } Assets;

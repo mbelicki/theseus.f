@@ -24,10 +24,59 @@ SDL_Surface *get_screen( const int width
     return screen;
 }
 
-Assets *load_assets()
+static void fill_wall_tex( const SDL_Surface * const context
+                         , Uint32 * const texture
+                         , const int width
+                         , const int height
+                         , const Color base_color
+                         )
 {
+    Uint32 color = INTIFY(base_color, context);
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            texture[i + width * j] = color;
+        }
+    }
+}
+
+Assets *load_assets(const SDL_Surface * const screen)
+{
+    if (screen == NULL) return NULL;
+
     Assets *assets = malloc(sizeof(Assets));
     if (assets == NULL) return NULL;
+
+    assets->tex_width  = 16;
+    assets->tex_height = 16;
+
+    const size_t tex_size  = assets->tex_width * assets->tex_height;
+    const size_t tex_count = 2;
+
+    Uint32 *textures = malloc(sizeof(Uint32) * tex_count * tex_size);
+    if (textures == NULL) {
+        free(assets);
+        return NULL;
+    }
+
+    assets->wall_tex  = textures;
+    assets->floor_tex = textures + tex_size;
+
+    const Color wall_color  = {255,   0,   0,   0};
+    const Color floor_color = {255, 255, 255, 255};
+
+    fill_wall_tex( screen
+                 , assets->wall_tex
+                 , assets->tex_width
+                 , assets->tex_height
+                 , wall_color
+                 );
+
+    fill_wall_tex( screen
+                 , assets->floor_tex
+                 , assets->tex_width
+                 , assets->tex_height
+                 , floor_color
+                 );
 
     return assets;
 }
