@@ -1,5 +1,8 @@
 #include <SDL/SDL.h>
+
 #include "levels.h"
+#include "generator.h"
+
 
 static TileType level_0[] =
     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
@@ -12,6 +15,25 @@ static TileType level_0[] =
     , 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1 
     , 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0,-1, 0, 1, 1 
     , 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1 
+    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1 
+    , 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1 
+    , 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+    };
+
+static TileType level_1[] =
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+    , 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 
+    , 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1 
+    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1 
+    , 1, 0, 1, 1,-1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1 
+    , 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1 
+    , 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1 
+    , 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0,-1, 0, 1, 1 
+    , 1, 0, 1, 1,-1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1 
     , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 
     , 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1 
     , 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 
@@ -46,7 +68,7 @@ void change_level( State * const state
                  , const int level
                  )
 {
-    if (state->map_data != NULL || state->map_is_dynamic) {
+    if (state->map_data != NULL && state->map_is_dynamic) {
         free(state->map_data);
     }
         
@@ -57,5 +79,17 @@ void change_level( State * const state
     //state->map_data = malloc(sizeof(TileType) * map_size);
     //if (state->map_data == NULL) return;
     
-    state->map_data = level_0;
+    if (level == 0) {
+        state->map_data = level_0;
+        state->map_is_dynamic = 0;
+    } else {
+        //state->map_data = level_1;
+        //state->map_is_dynamic = 0;
+        state->map_data = malloc(sizeof(TileType) * map_size);
+        if (state->map_data == NULL) return;
+
+        fill_with_maze(state->map_data, state->map_width, state->map_height);
+    }
+
+    state->current_level_no = level;
 }

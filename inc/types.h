@@ -26,6 +26,8 @@ typedef struct _State {
     int       map_width;
     int       map_height;
 
+    int current_level_no;
+
     Point  player_pos;
     Point  player_goto;
     Point  player_prev_pos;

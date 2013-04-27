@@ -9,7 +9,7 @@
 
 int get_keyboard(void);
 State *process(State *state, int new_keys, int old_keys, double time);
-State *update(State *state, double time);
+State *update(State *state, Assets *assets, double time);
 
 int is_not_done(void);
 
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
         time = (now - then) / 1000.0;
 
         state = process(state, new_keys, old_keys, time);
-        state = update(state, time);
+        state = update(state, assets, time);
         draw(state, screen, assets);
     }
     
@@ -139,7 +139,7 @@ State *process( State * const state
     return state;
 }
 
-State *update(State * const state, const double time)
+State *update(State * const state, Assets * const assets, const double time)
 {
     if (    state->player_pos.x == state->player_goto.x 
          && state->player_pos.y == state->player_goto.y) {
@@ -151,6 +151,12 @@ State *update(State * const state, const double time)
             state->player_prev_pos = state->player_pos;
             state->player_pos = state->player_goto;
         }
+    }
+
+    if (state->player_pos.x == state->map_width - 1) {
+        change_level(state, assets, 1);
+        state->player_pos.x = 0;
+        state->player_goto = state->player_prev_pos = state->player_pos;
     }
         
     return state;
