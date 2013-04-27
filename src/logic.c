@@ -136,7 +136,7 @@ static void update_enemy( Enemy * const enemy
         }
         const int destination = tile_at(enemy->destination.x, 
                                         enemy->destination.y, state);
-        if (destination > 0) {
+        if (destination != 0) {
             enemy->movement_delta = 0.0;
             enemy->destination = enemy->position;
             enemy->is_going_back = !enemy->is_going_back;
@@ -175,8 +175,17 @@ extern State *update_free( State * const state
         state->player_goto = state->player_prev_pos = state->player_pos;
     }
 
+    const int current = current_tile(state);
+    if (current == TILE_TRAP) {
+        state->type = STATE_LOST;
+    }
+
     for (int i = 0; i < state->map_enemy_count; i++) {
-        update_enemy(&state->map_enemies[i], state, time);
+        Enemy *enemy = state->map_enemies + i;
+        update_enemy(enemy, state, time);
+        if (POINT_EQ(state->player_pos, enemy->position)) {
+            state->type = STATE_LOST;
+        }
     }
         
     return state;

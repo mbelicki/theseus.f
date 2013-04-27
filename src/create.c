@@ -138,6 +138,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->enemy_tex  = textures + 5 * tex_size;
 
     assets->image_dangerous = load_image("gfx/dangerous.png");
+    assets->image_dead      = load_image("gfx/dead.png");
 
     const Color wall_color   = {255,  13,  51, 114};
     const Color floor_color  = {255,  65, 113, 191};

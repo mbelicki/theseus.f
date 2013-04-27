@@ -264,21 +264,21 @@ static void render_maze( const Dir * const grid
     for (int i = 0; i < map_width - 1; i++) {
         MAP_AT(i, entry_y) = TILE_FLOOR;
         
-        if (MAP_AT(i + 1, entry_y) != TILE_WALL)
+        if (MAP_AT(i + 1, entry_y) == TILE_FLOOR)
             break;
-        if (MAP_AT(i, entry_y + 1) != TILE_WALL)
+        if (MAP_AT(i, entry_y + 1) == TILE_FLOOR)
             break;
-        if (MAP_AT(i, entry_y - 1) != TILE_WALL)
+        if (MAP_AT(i, entry_y - 1) == TILE_FLOOR)
             break;
     }
     for (int i = map_width - 1; i > 0; i--) {
         MAP_AT(i, exit_y) = TILE_FLOOR;
         
-        if (MAP_AT(i + 1, exit_y) != TILE_WALL)
+        if (MAP_AT(i + 1, exit_y) == TILE_FLOOR)
             break;
-        if (MAP_AT(i, exit_y + 1) != TILE_WALL)
+        if (MAP_AT(i, exit_y + 1) == TILE_FLOOR)
             break;
-        if (MAP_AT(i, exit_y - 1) != TILE_WALL)
+        if (MAP_AT(i, exit_y - 1) == TILE_FLOOR)
             break;
     }
 #undef MAP_AT

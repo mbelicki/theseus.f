@@ -131,6 +131,15 @@ extern void draw_free( const State * const state
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
+extern void draw_dead( const State * const state   
+                     , SDL_Surface * const screen
+                     , const Assets * const assets
+                     )
+{
+    draw_image(screen, assets->image_dead);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
+
 extern void draw_intro( const State * const state   
                       , SDL_Surface * const screen
                       , const Assets * const assets

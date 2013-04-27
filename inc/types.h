@@ -12,6 +12,9 @@ typedef struct _Point {
     int y;
 } Point;
 
+#define POINT_EQ(p1, p2)\
+    ((p1).x == (p2).x && (p1).y == (p2).y)
+
 typedef struct _Enemy {
     Point  position;
     Point  destination;
@@ -31,6 +34,7 @@ typedef enum _TileType { TILE_STRING = -2
 
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
+                        , STATE_LOST
                         , STATE_FREE
                         , STATE_MAX = STATE_FREE
                         } StateType;
@@ -73,4 +77,5 @@ typedef struct _Assets {
     Uint32 *enemy_tex;
 
     SDL_Surface *image_dangerous;
+    SDL_Surface *image_dead;
 } Assets;

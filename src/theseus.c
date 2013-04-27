@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include <SDL/SDL.h>
 
 #include "types.h"
@@ -23,15 +24,19 @@ static StateBehavior *get_behavior_table()
 {
     StateBehavior intro = {process_splash, update_nop,  draw_intro};
     StateBehavior free  = {process_free,   update_free, draw_free};
+    StateBehavior dead  = {process_splash, update_nop,  draw_dead};
 
     behaviors[STATE_INTRO] = intro; 
     behaviors[STATE_FREE]  = free; 
+    behaviors[STATE_LOST]  = dead;
 
     return behaviors;
 }
 
 int main(int argc, char **argv)
 {
+    srand(time(NULL));
+    
     double time = 0;
     int keys    = 0;
     
@@ -46,7 +51,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    srand(8);
 
     change_level(state, assets, 0);
     StateBehavior *behaviors = get_behavior_table();
