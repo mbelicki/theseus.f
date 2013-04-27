@@ -33,13 +33,13 @@ Assets *load_assets()
 }
 
 static void fill_map_data( int * const map_data
-                          , const int width
-                          , const int height
-                          )
+                         , const int width
+                         , const int height
+                         )
 {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            map_data[i + width * j] = 0;
+            map_data[i + width * j] = (i == j);
         }
     }
 }

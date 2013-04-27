@@ -1,5 +1,9 @@
 #pragma once
 
+typedef struct _Color {
+    unsigned char a, r, g, b;
+} Color;
+
 typedef struct _Point {
     int x;
     int y;
