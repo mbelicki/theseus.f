@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
         state = process(state, new_keys, old_keys, time);
         state = update(state, assets, time);
-        draw(state, screen, assets);
+        draw_free(state, screen, assets);
     }
     
     printf("errorous errand occured: %s\n", SDL_GetError());

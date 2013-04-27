@@ -70,13 +70,19 @@ static void draw_map( const State * const state
             pixels[i + screen->w * j] = texture[u + assets->tex_width * v];
         }
     }
-
 }
 
-void draw( const State * const state   
-         , SDL_Surface * const screen
-         , const Assets * const assets
-         )
+static void draw_image( SDL_Surface * const screen
+                      , SDL_Surface * const image
+                      )
+{
+    SDL_BlitSurface(image, NULL, screen, NULL);
+}
+
+extern void draw_free( const State * const state   
+                     , SDL_Surface * const screen
+                     , const Assets * const assets
+                     )
 {
     const Point tile_size = { screen->w / (state->map_width  - 1)
                             , screen->h / (state->map_height - 1)
@@ -84,5 +90,14 @@ void draw( const State * const state
     
     draw_map(state, screen, assets, tile_size);
     draw_player(state, screen, assets, tile_size);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
+
+extern void draw_dang( const State * const state   
+                     , SDL_Surface * const screen
+                     , const Assets * const assets
+                     )
+{
+    draw_image(screen, assets->image_dangerous);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }

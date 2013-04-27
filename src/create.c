@@ -1,4 +1,5 @@
 #include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 
 #include "create.h"
 #include "levels.h"
@@ -100,6 +101,15 @@ static void fill_player_tex( const SDL_Surface * const context
     }
 }
 
+SDL_Surface *load_image(const char * const name)
+{
+    SDL_Surface *image = NULL;
+    if((image = IMG_Load(name)) == NULL) {
+        return NULL;
+    }
+    return image;
+}
+
 Assets *load_assets(const SDL_Surface * const screen)
 {
     if (screen == NULL) return NULL;
@@ -124,6 +134,8 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->trap_tex   = textures + 2 * tex_size;
     assets->string_tex = textures + 3 * tex_size;
     assets->player_tex = textures + 4 * tex_size;
+
+    assets->image_dangerous = load_image("gfx/dangerous.png");
 
     const Color wall_color   = {255,  13,  51, 114};
     const Color floor_color  = {255,  65, 113, 191};
@@ -173,6 +185,8 @@ State *create_initial_state()
 {
     State *state = malloc(sizeof(State));
     if (state == NULL) return NULL;
+
+    state->type = STATE_INTRO;
 
     state->player_pos.x = 0;
     state->player_pos.y = 8;

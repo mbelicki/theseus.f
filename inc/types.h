@@ -19,7 +19,13 @@ typedef enum _TileType {
     TILE_WALL   =  1
 } TileType;
 
+typedef enum _StateType { STATE_SPLASH
+                        , STATE_INTRO
+                        , STATE_FREE 
+                        } StateType;
+
 typedef struct _State {
+    StateType type;
 
     int       map_is_dynamic;
     TileType *map_data;
@@ -51,4 +57,6 @@ typedef struct _Assets {
     Uint32 *trap_tex;
     Uint32 *string_tex;
     Uint32 *player_tex;
+
+    SDL_Surface *image_dangerous;
 } Assets;
