@@ -101,50 +101,14 @@ static void fill_player_tex( const SDL_Surface * const context
     }
 }
 
-SDL_Surface *load_image(const char * const name)
+extern void RepaintProceduralTextures( Assets * const assets
+                                     , const SDL_Surface * const screen
+                                     , const Color wall_color
+                                     , const Color floor_color
+                                     , const Color trap_color
+                                     , const Color string_color
+                                     )
 {
-    SDL_Surface *image = NULL;
-    if((image = IMG_Load(name)) == NULL) {
-        printf("-> failed to load %s\n", name);
-        return NULL;
-    }
-    return image;
-}
-
-Assets *load_assets(const SDL_Surface * const screen)
-{
-    if (screen == NULL) return NULL;
-
-    Assets *assets = malloc(sizeof(Assets));
-    if (assets == NULL) return NULL;
-
-    assets->tex_width  = 32;
-    assets->tex_height = 32;
-
-    const size_t tex_size  = assets->tex_width * assets->tex_height;
-    const size_t tex_count = 6;
-
-    Uint32 *textures = malloc(sizeof(Uint32) * tex_count * tex_size);
-    if (textures == NULL) {
-        free(assets);
-        return NULL;
-    }
-
-    assets->wall_tex   = textures;
-    assets->floor_tex  = textures + tex_size;
-    assets->trap_tex   = textures + 2 * tex_size;
-    assets->string_tex = textures + 3 * tex_size;
-    assets->player_tex = textures + 4 * tex_size;
-    assets->enemy_tex  = textures + 5 * tex_size;
-
-    assets->image_dangerous = load_image("gfx/dangerous.png");
-    assets->image_dead      = load_image("gfx/dead.png");
-
-    const Color wall_color   = {255,  13,  51, 114};
-    const Color floor_color  = {255,  65, 113, 191};
-    const Color string_color = {255,  65, 187, 191};
-    const Color trap_color   = {255, 216,  67,  63};
-
     fill_wall_tex( screen
                  , assets->wall_tex
                  , assets->tex_width
@@ -188,6 +152,57 @@ Assets *load_assets(const SDL_Surface * const screen)
                    , trap_color
                    , floor_color
                    );
+}
+
+
+SDL_Surface *load_image(const char * const name)
+{
+    SDL_Surface *image = NULL;
+    if((image = IMG_Load(name)) == NULL) {
+        printf("-> failed to load %s\n", name);
+        return NULL;
+    }
+    return image;
+}
+
+Assets *load_assets(const SDL_Surface * const screen)
+{
+    if (screen == NULL) return NULL;
+
+    Assets *assets = malloc(sizeof(Assets));
+    if (assets == NULL) return NULL;
+
+    assets->tex_width  = 32;
+    assets->tex_height = 32;
+
+    const size_t tex_size  = assets->tex_width * assets->tex_height;
+    const size_t tex_count = 6;
+
+    Uint32 *textures = malloc(sizeof(Uint32) * tex_count * tex_size);
+    if (textures == NULL) {
+        free(assets);
+        return NULL;
+    }
+
+    assets->wall_tex   = textures;
+    assets->floor_tex  = textures + tex_size;
+    assets->trap_tex   = textures + 2 * tex_size;
+    assets->string_tex = textures + 3 * tex_size;
+    assets->player_tex = textures + 4 * tex_size;
+    assets->enemy_tex  = textures + 5 * tex_size;
+
+    assets->image_dangerous = load_image("gfx/dangerous.png");
+    assets->image_dead      = load_image("gfx/dead.png");
+
+    const Color wall_color   = {255,  13,  51, 114};
+    const Color floor_color  = {255,  65, 113, 191};
+    const Color trap_color   = {255, 216,  67,  63};
+    const Color string_color = {255,  65, 187, 191};
+    
+    RepaintProceduralTextures( assets, screen
+                             , wall_color, floor_color
+                             , trap_color, string_color
+                             );
 
     return assets;
 }
