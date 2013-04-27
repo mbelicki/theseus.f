@@ -58,6 +58,17 @@ TileType destination_tile(const State * const state)
                 + state->map_width * state->player_goto.y];
 }
 
+TileType antydestination_tile(const State * const state)
+{
+    const int dx = state->player_goto.x - state->player_pos.x;
+    const int dy = state->player_goto.y - state->player_pos.y;
+
+    const int x = state->player_pos.x - dx;
+    const int y = state->player_pos.y - dy;
+
+    return state->map_data[x + state->map_width * y];
+}
+
 TileType current_tile(const State * const state)
 {
     return state->map_data[state->player_pos.x 
@@ -95,17 +106,26 @@ State *process( State * const state
         }
 
         if ( state->player_move_delta == 1.0 ) {
-            int destination = destination_tile(state);
-            int current    = current_tile(state);
+            const int destination = destination_tile(state);
+            const int current     = current_tile(state);
+            const int antydest    = antydestination_tile(state);
 
-            if (destination > 0){
+            if ((state->player_goto.x != state->player_prev_pos.x 
+                  || state->player_goto.y != state->player_prev_pos.y)
+                &&
+                  (destination > 0 /* wall ahead */
+                   || (destination  == TILE_STRING 
+                        && antydest == TILE_STRING))
+               ){
+
                 state->player_goto = state->player_pos;
                 state->player_move_delta = 0.0;
             } else {
                 if (current == TILE_FLOOR && destination != TILE_STRING) {
                     set_tile(state, TILE_STRING, 
                              state->player_pos.x, state->player_pos.y);
-                } else if (current == TILE_STRING && destination != TILE_FLOOR) {
+                } else if (    current     == TILE_STRING 
+                            && destination != TILE_FLOOR) {
                     set_tile(state, TILE_FLOOR, 
                              state->player_pos.x, state->player_pos.y);
                 }
@@ -125,6 +145,7 @@ State *update(State * const state, const double time)
         state->player_move_delta -= state->player_move_speed * time;
         if (state->player_move_delta <= 0.0) {
             state->player_move_delta = 0.0;
+            state->player_prev_pos = state->player_pos;
             state->player_pos = state->player_goto;
         }
     }

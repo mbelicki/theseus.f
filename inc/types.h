@@ -27,6 +27,7 @@ typedef struct _State {
 
     Point  player_pos;
     Point  player_goto;
+    Point  player_prev_pos;
     double player_move_delta;
     double player_move_speed;
 } State;
