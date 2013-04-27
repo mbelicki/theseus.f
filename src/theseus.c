@@ -98,14 +98,14 @@ State *process( State * const state
             int destination = destination_tile(state);
             int current    = current_tile(state);
 
-            if (destination > 0) {
+            if (destination > 0){
                 state->player_goto = state->player_pos;
                 state->player_move_delta = 0.0;
             } else {
-                if (current == TILE_FLOOR && destination == TILE_FLOOR) {
+                if (current == TILE_FLOOR && destination != TILE_STRING) {
                     set_tile(state, TILE_STRING, 
                              state->player_pos.x, state->player_pos.y);
-                } else if (current == TILE_STRING && destination == TILE_STRING) {
+                } else if (current == TILE_STRING && destination != TILE_FLOOR) {
                     set_tile(state, TILE_FLOOR, 
                              state->player_pos.x, state->player_pos.y);
                 }
