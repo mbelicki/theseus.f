@@ -72,8 +72,8 @@ Assets *load_assets(const SDL_Surface * const screen)
     Assets *assets = malloc(sizeof(Assets));
     if (assets == NULL) return NULL;
 
-    assets->tex_width  = 16;
-    assets->tex_height = 16;
+    assets->tex_width  = 32;
+    assets->tex_height = 32;
 
     const size_t tex_size  = assets->tex_width * assets->tex_height;
     const size_t tex_count = 5;
@@ -134,7 +134,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     return assets;
 }
 
-static void fill_map_data( int * const map_data
+static void fill_map_data( TileType * const map_data
                          , const int width
                          , const int height
                          )
@@ -146,30 +146,51 @@ static void fill_map_data( int * const map_data
         }
     }
 
-    map_data[5 + width * 7] = TILE_WALL;
-    map_data[6 + width * 7] = TILE_WALL;
-    map_data[7 + width * 7] = TILE_WALL;
-    map_data[7 + width * 8] = TILE_WALL;
-    map_data[7 + width * 9] = TILE_TRAP;
+    map_data[5 + width *  7] = TILE_WALL;
+    map_data[6 + width *  7] = TILE_WALL;
+    map_data[7 + width *  7] = TILE_WALL;
+    map_data[7 + width *  8] = TILE_WALL;
+    map_data[7 + width *  9] = TILE_TRAP;
+    map_data[7 + width * 10] = TILE_WALL;
+    map_data[7 + width * 12] = TILE_WALL;
 }
+
+static TileType level_0[] =
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+    , 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 
+    , 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0 
+    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1 
+    , 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1 
+    , 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1 
+    , 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1 
+    , 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0,-1, 0, 1, 1 
+    , 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1 
+    , 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 
+    , 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1 
+    , 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1 
+    , 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+    };
 
 State *create_initial_state()
 {
     State *state = malloc(sizeof(State));
     if (state == NULL) return NULL;
 
-    state->player_pos.x = 2;
-    state->player_pos.y = 2;
+    state->player_pos.x = 0;
+    state->player_pos.y = 8;
     state->player_goto = state->player_prev_pos = state->player_pos;
 
     state->player_move_delta = 0.0;
     state->player_move_speed = 5.0;
 
-    state->map_width  = 32;
-    state->map_height = 32;
+    state->map_width  = 16;
+    state->map_height = 16;
     const int map_size = state->map_width * state->map_height;
 
-    state->map_data = malloc(sizeof(int) * map_size);
+    state->map_data = malloc(sizeof(TileType) * map_size);
     if (state->map_data == NULL){
         free(state);
         return NULL;
@@ -179,6 +200,7 @@ State *create_initial_state()
                  , state->map_width
                  , state->map_height
                  );
+    state->map_data = level_0;
 
     return state;
 }
