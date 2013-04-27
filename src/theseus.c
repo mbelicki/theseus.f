@@ -58,14 +58,17 @@ State *process( State * const state
               , const double time
               )
 {
-    if (new_keys & KEY_UP) {
-        state->player_pos.y -= 1;
-    } else if (new_keys & KEY_DOWN) {
-        state->player_pos.y += 1;
-    } else if (new_keys & KEY_LEFT) {
-        state->player_pos.x -= 1;
-    } else if (new_keys & KEY_RIGHT) {
-        state->player_pos.x += 1;
+    if (state->player_move_delta == 0) {
+        if (new_keys & KEY_UP) {
+            state->player_goto.y -= 1;
+        } else if (new_keys & KEY_DOWN) {
+            state->player_goto.y += 1;
+        } else if (new_keys & KEY_LEFT) {
+            state->player_goto.x -= 1;
+        } else if (new_keys & KEY_RIGHT) {
+            state->player_goto.x += 1;
+        }
+        state->player_move_delta = 1.0;
     }
 
     return state;
@@ -73,6 +76,17 @@ State *process( State * const state
 
 State *update(State * const state, const double time)
 {
+    if (    state->player_pos.x == state->player_goto.x 
+         && state->player_pos.y == state->player_goto.y) {
+        state->player_move_delta = 0.0; 
+    } else {
+        state->player_move_delta -= state->player_move_speed * time;
+        if (state->player_move_delta <= 0.0) {
+            state->player_move_delta = 0.0;
+            state->player_pos = state->player_goto;
+        }
+    }
+        
     return state;
 }
 

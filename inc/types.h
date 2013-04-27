@@ -14,11 +14,14 @@ typedef struct _Point {
 
 typedef struct _State {
 
-    int       *map_data;
-    int        map_width;
-    int        map_height;
+    int   *map_data;
+    int    map_width;
+    int    map_height;
 
-    Point      player_pos;
+    Point  player_pos;
+    Point  player_goto;
+    double player_move_delta;
+    double player_move_speed;
 } State;
 
 typedef enum _Key {

@@ -149,8 +149,11 @@ State *create_initial_state()
     State *state = malloc(sizeof(State));
     if (state == NULL) return NULL;
 
-    state->player_pos.x = 2;
-    state->player_pos.y = 2;
+    state->player_pos.x = state->player_goto.x = 2;
+    state->player_pos.y = state->player_goto.y = 2;
+
+    state->player_move_delta = 0.0;
+    state->player_move_speed = 5.0;
 
     state->map_width  = 32;
     state->map_height = 32;
