@@ -207,6 +207,7 @@ State *create_initial_state()
     
     state->map_data = NULL;
     state->map_enemies = malloc(sizeof(Enemy) * MAX_ENEMY_COUNT);
+    state->map_enemy_count = 0;
 
     return state;
 }

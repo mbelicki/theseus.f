@@ -92,5 +92,9 @@ void change_level( State * const state
         fill_with_maze(state->map_data, state->map_width, state->map_height);
     }
 
+    Enemy enemy = {{2, 1}, {2, 1}, 0.0, 1, 0};
+    state->map_enemies[0] = enemy;
+    state->map_enemy_count = 1;
+
     state->current_level_no = level;
 }

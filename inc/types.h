@@ -20,7 +20,7 @@ typedef struct _Enemy {
     int    is_going_back;
 } Enemy;
 
-#define ENEMY_SPEED 3.0
+#define ENEMY_SPEED 7.0
 #define MAX_ENEMY_COUNT 4
 
 typedef enum _TileType { TILE_STRING = -2

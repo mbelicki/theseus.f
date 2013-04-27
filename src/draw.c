@@ -123,6 +123,11 @@ extern void draw_free( const State * const state
     
     draw_map(state, screen, assets, tile_size);
     draw_player(state, screen, assets, tile_size);
+
+    for (int i = 0; i < state->map_enemy_count; i++) {
+        draw_enemy(&state->map_enemies[i], screen, assets, tile_size);
+    }
+
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
