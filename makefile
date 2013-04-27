@@ -3,8 +3,8 @@ EMCC=~/sources/emscripten/emcc
 COMMON_OPTS=-lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -g -O3
 STATIC_LIB=-static-libgcc
 
-all: create.o draw.o levels.o generator.o src/theseus.c
-	gcc src/theseus.c create.o levels.o draw.o generator.o \
+all: create.o draw.o levels.o generator.o logic.o src/theseus.c
+	gcc src/theseus.c create.o levels.o draw.o logic.o generator.o \
 			-o theseus $(COMMON_OPTS)
 
 draw.o: src/draw.c
@@ -18,6 +18,9 @@ levels.o: src/levels.c
 
 generator.o: src/generator.c
 	gcc src/generator.c -o generator.o -c $(COMMON_OPTS)
+
+logic.o: src/logic.c
+	gcc src/logic.c -o logic.o -c $(COMMON_OPTS)
 
 clean:
 	rm -f *.o theseus

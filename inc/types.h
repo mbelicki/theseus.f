@@ -21,7 +21,8 @@ typedef enum _TileType {
 
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
-                        , STATE_FREE 
+                        , STATE_FREE
+                        , STATE_MAX = STATE_FREE
                         } StateType;
 
 typedef struct _State {

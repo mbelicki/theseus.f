@@ -93,10 +93,10 @@ extern void draw_free( const State * const state
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
-extern void draw_dang( const State * const state   
-                     , SDL_Surface * const screen
-                     , const Assets * const assets
-                     )
+extern void draw_intro( const State * const state   
+                      , SDL_Surface * const screen
+                      , const Assets * const assets
+                      )
 {
     draw_image(screen, assets->image_dangerous);
     SDL_UpdateRect(screen, 0, 0, 0, 0);

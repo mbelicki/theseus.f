@@ -6,12 +6,29 @@
 #include "create.h"
 #include "draw.h"
 #include "levels.h"
+#include "logic.h"
 
 int get_keyboard(void);
-State *process(State *state, int new_keys, int old_keys, double time);
-State *update(State *state, Assets *assets, double time);
-
 int is_not_done(void);
+
+typedef struct _StateBehavior {
+    State *(*process)(State *state, int new_keys, int old_keys, double time);
+    State *(*update)(State *state, Assets *assets, double time);
+    void (*draw)(const State *state, SDL_Surface *screen, const Assets *assets);
+} StateBehavior;
+
+static StateBehavior behaviors[STATE_MAX + 1];
+
+static StateBehavior *get_behavior_table()
+{
+    StateBehavior intro = {process_splash, update_nop,  draw_intro};
+    StateBehavior free  = {process_free,   update_free, draw_free};
+
+    behaviors[STATE_INTRO] = intro; 
+    behaviors[STATE_FREE]  = free; 
+
+    return behaviors;
+}
 
 int main(int argc, char **argv)
 {
@@ -24,12 +41,13 @@ int main(int argc, char **argv)
     State       *state  = create_initial_state();
     SDL_Surface *screen = get_screen(512, 512, "theseus");
     Assets      *assets = load_assets(screen);
-   
-    change_level(state, assets, 0);
 
     if (screen == NULL || state == NULL || assets == NULL) {
         exit(1);
     }
+
+    change_level(state, assets, 0);
+    StateBehavior *behaviors = get_behavior_table();
 
     while (is_not_done()) {
         int old_keys = keys;
@@ -39,9 +57,13 @@ int main(int argc, char **argv)
         now = SDL_GetTicks();
         time = (now - then) / 1000.0;
 
-        state = process(state, new_keys, old_keys, time);
-        state = update(state, assets, time);
-        draw_free(state, screen, assets);
+        StateBehavior behav = behaviors[state->type];
+
+        state = behav.process(state, new_keys, old_keys, time);
+        state = behav.update(state, assets, time);
+        behav.draw(state, screen, assets);
+
+        keys = new_keys;
     }
     
     printf("errorous errand occured: %s\n", SDL_GetError());
@@ -53,113 +75,6 @@ int is_not_done(void)
     SDL_Event event = {0};
     SDL_PollEvent(&event);
     return event.type != SDL_QUIT;
-}
-
-TileType destination_tile(const State * const state)
-{
-    return state->map_data[state->player_goto.x 
-                + state->map_width * state->player_goto.y];
-}
-
-TileType antydestination_tile(const State * const state)
-{
-    const int dx = state->player_goto.x - state->player_pos.x;
-    const int dy = state->player_goto.y - state->player_pos.y;
-
-    const int x = state->player_pos.x - dx;
-    const int y = state->player_pos.y - dy;
-
-    return state->map_data[x + state->map_width * y];
-}
-
-TileType current_tile(const State * const state)
-{
-    return state->map_data[state->player_pos.x 
-                + state->map_width * state->player_pos.y];
-}
-
-void set_tile( State * const state
-             , const TileType t
-             , const int x
-             , const int y
-             )
-{
-    state->map_data[x + state->map_width * y] = t;
-}
-
-State *process( State * const state
-              , const int new_keys
-              , const int old_keys
-              , const double time
-              )
-{
-    if (state->player_move_delta == 0.0) {
-        if (new_keys & KEY_UP) {
-            state->player_goto.y -= 1;
-            state->player_move_delta = 1.0;
-        } else if (new_keys & KEY_DOWN) {
-            state->player_goto.y += 1;
-            state->player_move_delta = 1.0;
-        } else if (new_keys & KEY_LEFT) {
-            state->player_goto.x -= 1;
-            state->player_move_delta = 1.0;
-        } else if (new_keys & KEY_RIGHT) {
-            state->player_goto.x += 1;
-            state->player_move_delta = 1.0;
-        }
-
-        if ( state->player_move_delta == 1.0 ) {
-            const int destination = destination_tile(state);
-            const int current     = current_tile(state);
-            const int antydest    = antydestination_tile(state);
-
-            if ((state->player_goto.x != state->player_prev_pos.x 
-                  || state->player_goto.y != state->player_prev_pos.y)
-                &&
-                  (destination > 0 /* wall ahead */
-                   || (destination  == TILE_STRING 
-                        && antydest == TILE_STRING))
-               ){
-
-                state->player_goto = state->player_pos;
-                state->player_move_delta = 0.0;
-            } else {
-                if (current == TILE_FLOOR && destination != TILE_STRING) {
-                    set_tile(state, TILE_STRING, 
-                             state->player_pos.x, state->player_pos.y);
-                } else if (    current     == TILE_STRING 
-                            && destination != TILE_FLOOR) {
-                    set_tile(state, TILE_FLOOR, 
-                             state->player_pos.x, state->player_pos.y);
-                }
-            }
-        }
-    }
-    
-    return state;
-}
-
-State *update(State * const state, Assets * const assets, const double time)
-{
-    if (    state->player_pos.x == state->player_goto.x 
-         && state->player_pos.y == state->player_goto.y) {
-        state->player_move_delta = 0.0; 
-    } else {
-        state->player_move_delta -= state->player_move_speed * time;
-        if (state->player_move_delta <= 0.0) {
-            state->player_move_delta = 0.0;
-            state->player_prev_pos = state->player_pos;
-            state->player_pos = state->player_goto;
-        }
-    }
-
-    if (state->player_pos.x == state->map_width - 1) {
-        change_level(state, assets, 1);
-        state->player_pos.x = 0;
-        state->player_goto = state->player_prev_pos = state->player_pos;
-    }
-        
-    return state;
 }
 
 int get_keyboard()
