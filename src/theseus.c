@@ -22,13 +22,17 @@ static StateBehavior behaviors[STATE_MAX + 1];
 
 static StateBehavior *get_behavior_table()
 {
-    StateBehavior intro = {process_splash, update_nop,  draw_intro};
-    StateBehavior free  = {process_free,   update_free, draw_free};
-    StateBehavior dead  = {process_splash, update_nop,  draw_dead};
+    StateBehavior splash = {process_splash, update_nop,  draw_splash};
+    StateBehavior intro  = {process_splash, update_nop,  draw_intro};
+    StateBehavior free   = {process_free,   update_free, draw_free};
+    StateBehavior trade  = {process_splash, update_nop,  draw_trade};
+    StateBehavior dead   = {process_splash, update_nop,  draw_dead};
 
-    behaviors[STATE_INTRO] = intro; 
-    behaviors[STATE_FREE]  = free; 
-    behaviors[STATE_LOST]  = dead;
+    behaviors[STATE_SPLASH] = splash; 
+    behaviors[STATE_INTRO]  = intro; 
+    behaviors[STATE_FREE]   = free;
+    behaviors[STATE_TRADE]  = trade; 
+    behaviors[STATE_LOST]   = dead;
 
     return behaviors;
 }

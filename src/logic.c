@@ -115,7 +115,9 @@ extern State *process_splash( State *state
 {
     if (old_keys & KEY_UP) {
         if ((new_keys & KEY_UP) == 0) {
-            change_state(state, STATE_FREE);
+            StateType next
+                = state->type == STATE_SPLASH ? STATE_INTRO : STATE_FREE;
+            change_state(state, next);
         }
     }
     return state;
@@ -236,6 +238,8 @@ extern State *update_free( State * const state
     const int current = current_tile(state);
     if (current == TILE_TRAP) {
         die(state);
+    } else if (current == TILE_TRADER) {
+        change_state(state, STATE_TRADE);
     }
 
     for (int i = 0; i < state->map_enemy_count; i++) {

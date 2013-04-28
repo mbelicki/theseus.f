@@ -96,5 +96,7 @@ void change_level( State * const state
     state->map_enemies[0] = enemy;
     state->map_enemy_count = 1;
 
+    state->map_data[4 + state->map_width * 5] = TILE_TRADER;
+
     state->current_level_no = level;
 }

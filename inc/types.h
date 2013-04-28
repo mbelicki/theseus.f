@@ -23,18 +23,27 @@ typedef struct _Enemy {
     int    is_going_back;
 } Enemy;
 
-#define ENEMY_SPEED 7.0
+#define ENEMY_SPEED 5.0
 #define MAX_ENEMY_COUNT 4
 
-typedef enum _TileType { TILE_STRING = -2
+typedef enum _TileType { TILE_BOSS   = -4
+                       , TILE_TRADER = -3
+                       , TILE_STRING = -2
                        , TILE_TRAP   = -1
                        , TILE_FLOOR  =  0
                        , TILE_WALL   =  1
                        } TileType;
 
+typedef enum _Item { ITEM_POTATO
+                   , ITEM_SWORD
+                   , ITEM_POISON
+                   } Item;
+
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
                         , STATE_LOST
+                        , STATE_BOSS
+                        , STATE_TRADE
                         , STATE_FREE
                         , STATE_MAX = STATE_FREE
                         } StateType;
@@ -57,6 +66,9 @@ typedef struct _State {
     Point  player_prev_pos;
     double player_move_delta;
     double player_move_speed;
+    Item   player_item;
+
+    Item   trader_item;
 
     double marquee_amount;
     int    is_marquee_closing;
@@ -86,6 +98,6 @@ typedef struct _Assets {
     Uint32 *enemy_tex;
 
     SDL_Surface *image_dangerous;
-    SDL_Surface *image_dead;
+    SDL_Surface *image_trader;
     SDL_Surface *image_font;
 } Assets;

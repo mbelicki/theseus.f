@@ -195,6 +195,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->enemy_tex  = textures + 5 * tex_size;
 
     assets->image_dangerous = load_image("gfx/dangerous.png");
+    assets->image_trader    = load_image("gfx/trader.png");
     assets->image_font      = load_image("gfx/font.png");
 
     const Color wall_color   = {255,  13,  51, 114};
@@ -215,7 +216,7 @@ State *create_initial_state()
     State *state = malloc(sizeof(State));
     if (state == NULL) return NULL;
 
-    state->type = STATE_INTRO;
+    state->type = STATE_SPLASH;
     state->next_type = state->type;
 
     state->marquee_amount = 0.0;
@@ -228,6 +229,8 @@ State *create_initial_state()
     state->player_move_delta = 0.0;
     state->player_move_speed = 7.0; /* in tiles per second */
     
+    state->player_item = ITEM_POTATO;
+
     state->map_data = NULL;
     state->map_enemies = malloc(sizeof(Enemy) * MAX_ENEMY_COUNT);
     state->map_enemy_count = 0;
