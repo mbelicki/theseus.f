@@ -196,6 +196,7 @@ Assets *load_assets(const SDL_Surface * const screen)
 
     assets->image_dangerous = load_image("gfx/dangerous.png");
     assets->image_trader    = load_image("gfx/trader.png");
+    assets->image_boss      = load_image("gfx/boss.png");
     assets->image_font      = load_image("gfx/font.png");
 
     const Color wall_color   = {255,  13,  51, 114};
@@ -218,6 +219,8 @@ State *create_initial_state()
 
     state->type = STATE_SPLASH;
     state->next_type = state->type;
+
+    state->requested_quit = 0;
 
     state->marquee_amount = 0.0;
     state->is_marquee_closing = 0;

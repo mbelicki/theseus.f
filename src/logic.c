@@ -113,26 +113,39 @@ extern State *process_splash( State *state
                             , double time
                             )
 {
+    int up_pressed   = old_keys & KEY_UP && (new_keys & KEY_UP) == 0;
+    int down_pressed = old_keys & KEY_DOWN && (new_keys & KEY_DOWN) == 0;
+
+
     if (state->type == STATE_TRADE) {
-        if (old_keys & KEY_UP && (new_keys & KEY_UP) == 0) {
+        if (up_pressed) {
             state->player_item = state->trader_item;
             state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
             set_tile(state, TILE_FLOOR, 
                      state->player_pos.x, state->player_pos.y);
             change_state(state, STATE_FREE);
-        } else if (old_keys & KEY_DOWN && (new_keys & KEY_DOWN) == 0) {
+        } else if (down_pressed) {
             state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
             set_tile(state, TILE_FLOOR, 
                      state->player_pos.x, state->player_pos.y);
             change_state(state, STATE_FREE);
         }
-        return state;
-    }
-    
-    if (old_keys & KEY_UP && (new_keys & KEY_UP) == 0) {
-        StateType next
-            = state->type == STATE_SPLASH ? STATE_INTRO : STATE_FREE;
-        change_state(state, next);
+    } else if (state->type == STATE_BOSS) {
+        if (up_pressed) {
+            StateType next
+                = state->player_item == ITEM_POTATO ? STATE_WON : STATE_OVER;
+            change_state(state, next);
+        }
+    } else if (state->type == STATE_WON || state->type == STATE_OVER) {
+        if (up_pressed) {
+            state->requested_quit = 1;
+        }
+    } else {
+        if (old_keys & KEY_UP && (new_keys & KEY_UP) == 0) {
+            StateType next
+                = state->type == STATE_SPLASH ? STATE_INTRO : STATE_FREE;
+            change_state(state, next);
+        }
     }
 
     return state;
@@ -255,6 +268,8 @@ extern State *update_free( State * const state
         die(state);
     } else if (current == TILE_TRADER) {
         change_state(state, STATE_TRADE);
+    } else if (current == TILE_BOSS) {
+        change_state(state, STATE_BOSS);
     }
 
     for (int i = 0; i < state->map_enemy_count; i++) {

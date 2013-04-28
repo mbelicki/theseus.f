@@ -37,12 +37,15 @@ typedef enum _TileType { TILE_BOSS   = -4
 typedef enum _Item { ITEM_POTATO
                    , ITEM_SWORD
                    , ITEM_POISON
+                   , ITEM_CHAINSAW
                    , MAX_ITEM = ITEM_POISON
                    } Item;
 
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
                         , STATE_LOST
+                        , STATE_WON
+                        , STATE_OVER
                         , STATE_BOSS
                         , STATE_TRADE
                         , STATE_FREE
@@ -73,6 +76,8 @@ typedef struct _State {
 
     double marquee_amount;
     int    is_marquee_closing;
+
+    int requested_quit;
 } State;
 
 #define MARQUEE_SPEED 3.2
@@ -100,5 +105,6 @@ typedef struct _Assets {
 
     SDL_Surface *image_dangerous;
     SDL_Surface *image_trader;
+    SDL_Surface *image_boss;
     SDL_Surface *image_font;
 } Assets;

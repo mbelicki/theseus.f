@@ -10,7 +10,7 @@
 #include "logic.h"
 
 int get_keyboard(void);
-int is_not_done(void);
+int is_not_done(const State * const state);
 
 typedef struct _StateBehavior {
     State *(*process)(State *state, int new_keys, int old_keys, double time);
@@ -26,13 +26,19 @@ static StateBehavior *get_behavior_table()
     StateBehavior intro  = {process_splash, update_nop,  draw_intro};
     StateBehavior free   = {process_free,   update_free, draw_free};
     StateBehavior trade  = {process_splash, update_nop,  draw_trade};
+    StateBehavior boss   = {process_splash, update_nop,  draw_boss};
     StateBehavior dead   = {process_splash, update_nop,  draw_dead};
+    StateBehavior won    = {process_splash, update_nop,  draw_won};
+    StateBehavior over   = {process_splash, update_nop,  draw_over};
 
     behaviors[STATE_SPLASH] = splash; 
     behaviors[STATE_INTRO]  = intro; 
     behaviors[STATE_FREE]   = free;
     behaviors[STATE_TRADE]  = trade; 
+    behaviors[STATE_BOSS]   = boss;
     behaviors[STATE_LOST]   = dead;
+    behaviors[STATE_OVER]   = over;
+    behaviors[STATE_WON]    = won;
 
     return behaviors;
 }
@@ -58,7 +64,7 @@ int main(int argc, char **argv)
     change_level(state, assets, 0);
     StateBehavior *behaviors = get_behavior_table();
 
-    while (is_not_done()) {
+    while (is_not_done(state)) {
         int old_keys = keys;
         int new_keys = get_keyboard();
         
@@ -83,11 +89,11 @@ int main(int argc, char **argv)
     exit(0);
 }
 
-int is_not_done(void)
+int is_not_done(const State * const state)
 {
     SDL_Event event = {0};
     SDL_PollEvent(&event);
-    return event.type != SDL_QUIT;
+    return event.type != SDL_QUIT && state->requested_quit == 0;
 }
 
 int get_keyboard()

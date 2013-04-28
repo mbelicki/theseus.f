@@ -306,24 +306,48 @@ extern void draw_dead( const State * const state
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
-extern void draw_splash( const State * const state   
-                       , SDL_Surface * const screen
-                       , const Assets * const assets
-                       )
+static void draw_caption( const State * const state   
+                        , SDL_Surface * const screen
+                        , const Assets * const assets
+                        , const char * const caption
+                        )
 {
     fill_screen(screen, assets->splash_color);
 
-    const char * title = "THESEUS.F";
-    const Point size = measure_text(title);
+    const Point size = measure_text(caption);
 
     Point dest = {(screen->w - size.x) / 2, (screen->h - size.y) / 2};
-    draw_text(screen, assets->image_font, dest, title);
+    draw_text(screen, assets->image_font, dest, caption);
 
     Point key = {(screen->w - 32) / 2, (screen->h - 36) / 2 + 64};
     draw_key(screen, assets->image_font, key, KEY_UP);
 
     handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
+
+extern void draw_splash( const State * const state   
+                       , SDL_Surface * const screen
+                       , const Assets * const assets
+                       )
+{
+    draw_caption(state, screen, assets, "THESEUS.F");
+}
+
+extern void draw_won( const State * const state   
+                    , SDL_Surface * const screen
+                    , const Assets * const assets
+                    )
+{
+    draw_caption(state, screen, assets, "YOU WIN");
+}
+
+extern void draw_over( const State * const state   
+                     , SDL_Surface * const screen
+                     , const Assets * const assets
+                     )
+{
+    draw_caption(state, screen, assets, "GAME OVER");
 }
 
 extern void draw_intro( const State * const state   
@@ -340,9 +364,11 @@ extern void draw_intro( const State * const state
 static const char *name_item(Item item)
 {
     switch (item) {
-        case ITEM_POTATO: return "POTATO";
-        case ITEM_SWORD:  return "SWORD";
-        case ITEM_POISON: return "POISON";
+        case ITEM_POTATO:   return "POTATO";
+        case ITEM_SWORD:    return "SWORD";
+        case ITEM_POISON:   return "POISON";
+        case ITEM_CHAINSAW: return "CHAINSAW";
+        default: return "THING";
     }
 }
 
@@ -367,7 +393,7 @@ extern void draw_trade( const State * const state
     const char * player_item = name_item(state->player_item);
     const char * trader_item = name_item(state->trader_item);
 
-    const char * fst_says = "'GIVE ME YOUR";
+    const char * fst_says = "\"GIVE ME YOUR";
     char snd_says[32]; sprintf(snd_says, "%s TO GET", player_item);
     char thr_says[32]; sprintf(thr_says, "THIS %s`", trader_item);
 
@@ -393,6 +419,50 @@ extern void draw_trade( const State * const state
     draw_key(screen, assets->image_font, key_no, KEY_DOWN);
     draw_text(screen, assets->image_font, cap_no, "NO");
 
+    handle_marquee(state, screen, assets);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
+}
+
+extern void draw_boss( const State * const state   
+                     , SDL_Surface * const screen
+                     , const Assets * const assets
+                     )
+{
+    draw_image(screen, assets->image_boss);
+
+    const char * fst_ln = "A WILD MINOTAUR";
+    const char * snd_ln = "APPEARS";
+
+    Point size = measure_text(fst_ln);
+    const Point fst_dest = {(screen->w - size.x)/2, 16};
+    draw_text(screen, assets->image_font, fst_dest, fst_ln);
+
+    size = measure_text(snd_ln);
+    const Point snd_dest = {(screen->w - size.x)/2, 48};
+    draw_text(screen, assets->image_font, snd_dest, snd_ln);
+
+    const char * player_item = name_item(state->player_item);
+    const char * trader_item = name_item(state->trader_item);
+
+    int is_effective = state->player_item == ITEM_POTATO;
+
+    const char * fst_says = "YOU USE YOUR";
+    char snd_says[32]; sprintf(snd_says, "%s, IT'S", player_item);
+    char thr_says[32]; sprintf(thr_says, "%s EFFECTIVE", 
+                    is_effective ? "SUPER" : "NOT");
+
+    size = measure_text(fst_says);
+    const Point fst_says_dest = {(screen->w - size.x) / 2, 272};
+    draw_text(screen, assets->image_font, fst_says_dest, fst_says);
+
+    size = measure_text(snd_says);
+    const Point snd_says_dest = {(screen->w - size.x) / 2, 272 + 48};
+    draw_text(screen, assets->image_font, snd_says_dest, snd_says);
+
+    size = measure_text(thr_says);
+    const Point thr_says_dest = {(screen->w - size.x) / 2, 272 + 2 * 48};
+    draw_text(screen, assets->image_font, thr_says_dest, thr_says);
+    
     handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
