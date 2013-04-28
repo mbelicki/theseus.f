@@ -258,7 +258,7 @@ extern State *update_free( State * const state
     }
 
     if (state->player_pos.x == state->map_width - 1) {
-        change_level(state, assets, 1);
+        change_level(state, assets, state->current_level_no + 1);
         state->player_pos.x = 0;
         state->player_goto = state->player_prev_pos = state->player_pos;
     }
