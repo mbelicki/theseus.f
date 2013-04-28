@@ -109,6 +109,8 @@ extern void RepaintProceduralTextures( Assets * const assets
                                      , const Color string_color
                                      )
 {
+    assets->level_color = wall_color;
+
     fill_wall_tex( screen
                  , assets->wall_tex
                  , assets->tex_width
@@ -213,6 +215,10 @@ State *create_initial_state()
     if (state == NULL) return NULL;
 
     state->type = STATE_INTRO;
+    state->next_type = state->type;
+
+    state->marquee_amount = 0.0;
+    state->is_marquee_closing = 0;
 
     state->player_pos.x = 1;
     state->player_pos.y = 8;

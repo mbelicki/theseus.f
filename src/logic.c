@@ -66,11 +66,39 @@ static void clean_map(State * const state)
 #undef AT
 }
 
+static void change_state(State * const state, const StateType next)
+{
+    state->next_type = next;
+    state->is_marquee_closing = 1;
+}
+
 static void die(State * const state)
 {
-    state->type = STATE_LOST;
+    change_state(state, STATE_LOST);
     reset_player_position(state);
     clean_map(state);
+}
+
+extern int is_marquee_on(const State * const state)
+{
+    return state->is_marquee_closing || state->marquee_amount > 0.0;
+}
+
+extern void handle_marquee(State * const state, const double time)
+{
+    if (state->is_marquee_closing) {
+        state->marquee_amount += MARQUEE_SPEED * time;
+        if (state->marquee_amount >= 1.0) {
+            state->marquee_amount = 1.0;
+            state->is_marquee_closing = 0;
+            state->type = state->next_type;
+        }
+    } else if (state->marquee_amount > 0.0) {
+        state->marquee_amount -= MARQUEE_SPEED * time;
+        if (state->marquee_amount <= 0.0) {
+            state->marquee_amount = 0.0;
+        }
+    }
 }
 
 extern State *update_nop(State *state, Assets *assets, double time)
@@ -87,7 +115,7 @@ extern State *process_splash( State *state
 {
     if (old_keys & KEY_UP) {
         if ((new_keys & KEY_UP) == 0) {
-            state->type = STATE_FREE;
+            change_state(state, STATE_FREE);
         }
     }
     return state;

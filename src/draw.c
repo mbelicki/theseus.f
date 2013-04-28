@@ -1,4 +1,6 @@
 #include <SDL/SDL.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "draw.h"
 
@@ -112,6 +114,37 @@ static void draw_image( SDL_Surface * const screen
     SDL_LockSurface(screen);
 }
 
+static void draw_marquee( SDL_Surface * const screen
+                        , const Color fill_color
+                        , const double amount
+                        )
+{
+    const Uint32 color = INTIFY(fill_color, screen);
+    const double k = amount > 1.0 ? 1.0 : (amount < 0.0 ? 0.0 : amount);
+    const int width = (int)((screen->w / 2) * k);
+    
+    /* left side */
+    SDL_Rect lrect = {0, 0, width, screen->h}; /* x, y, w, h */
+    SDL_FillRect(screen, &lrect, color);
+    /* right side */
+    SDL_Rect rrect = {screen->w - width, 0, width, screen->h}; /* x, y, w, h */
+    SDL_FillRect(screen, &rrect, color);
+}
+
+static void handle_marquee( const State * const state
+                          , SDL_Surface * const screen
+                          , const Assets * const assets 
+                          )
+{
+    const double amount = state->marquee_amount;
+    if (amount <= 0.0) return;
+    
+    const double k = (1.0 - cos(amount * 3.1415)) / 2;
+
+    const Color color = assets->level_color;
+    draw_marquee(screen, color, k);
+} 
+
 extern void draw_free( const State * const state   
                      , SDL_Surface * const screen
                      , const Assets * const assets
@@ -128,6 +161,7 @@ extern void draw_free( const State * const state
         draw_enemy(&state->map_enemies[i], screen, assets, tile_size);
     }
 
+    handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
@@ -137,6 +171,8 @@ extern void draw_dead( const State * const state
                      )
 {
     draw_image(screen, assets->image_dead);
+
+    handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
@@ -146,5 +182,7 @@ extern void draw_intro( const State * const state
                       )
 {
     draw_image(screen, assets->image_dangerous);
+
+    handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }

@@ -51,7 +51,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-
     change_level(state, assets, 0);
     StateBehavior *behaviors = get_behavior_table();
 
@@ -64,9 +63,13 @@ int main(int argc, char **argv)
         time = (now - then) / 1000.0;
 
         StateBehavior behav = behaviors[state->type];
-
-        state = behav.process(state, new_keys, old_keys, time);
-        state = behav.update(state, assets, time);
+        
+        if (is_marquee_on(state)) {
+            handle_marquee(state, time);
+        } else {
+            state = behav.process(state, new_keys, old_keys, time);
+            state = behav.update(state, assets, time);
+        }
         behav.draw(state, screen, assets);
 
         keys = new_keys;

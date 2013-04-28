@@ -41,6 +41,7 @@ typedef enum _StateType { STATE_SPLASH
 
 typedef struct _State {
     StateType type;
+    StateType next_type;
 
     int       map_is_dynamic;
     TileType *map_data;
@@ -56,7 +57,12 @@ typedef struct _State {
     Point  player_prev_pos;
     double player_move_delta;
     double player_move_speed;
+
+    double marquee_amount;
+    int    is_marquee_closing;
 } State;
+
+#define MARQUEE_SPEED 3.2
 
 typedef enum _Key {
     KEY_UP    = 1,
@@ -68,6 +74,8 @@ typedef enum _Key {
 typedef struct _Assets {
     int tex_width;
     int tex_height;
+
+    Color level_color;
 
     Uint32 *wall_tex;
     Uint32 *floor_tex;
