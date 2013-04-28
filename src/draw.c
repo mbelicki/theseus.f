@@ -105,6 +105,52 @@ static void draw_map( const State * const state
     }
 }
 
+static void fill_screen(SDL_Surface * const screen, const Color fill_color)
+{
+    Uint32 color = INTIFY(fill_color, screen);
+    SDL_FillRect(screen, NULL, color);
+}
+
+static Point measure_text(const char * const text)
+{
+    Point dimmensions = {strlen(text) * 32, 36};
+    return dimmensions;
+}
+
+static void draw_text( SDL_Surface * const screen
+                     , SDL_Surface * const font
+                     , const Point destination
+                     , const char * const text
+                     )
+{
+    const int glyph_width  = 32;
+    const int glyph_height = 36;
+
+    SDL_UnlockSurface(screen);
+    
+    int x = destination.x;
+    int y = destination.y;
+
+    for (const char *p = text; *p != 0; p++) {
+        const char c = *p - 1;
+        if (c == ' ' - 1) {
+            x +=glyph_width;
+            continue;
+        }
+        if (c < 32 || c > 126) continue;
+        
+        int u = ((((int)c) - 32) % 16) * glyph_width;
+        int v = ((((int)c) - 32) / 16) * glyph_height;
+
+        SDL_Rect char_rect = {u, v, glyph_width, glyph_height};
+        SDL_Rect dest_rect = {x, y, glyph_width, glyph_height};
+        SDL_BlitSurface(font, &char_rect, screen, &dest_rect);
+        x += glyph_width;
+    }
+
+    SDL_LockSurface(screen);
+}
+
 static void draw_image( SDL_Surface * const screen
                       , SDL_Surface * const image
                       )
@@ -170,7 +216,14 @@ extern void draw_dead( const State * const state
                      , const Assets * const assets
                      )
 {
-    draw_image(screen, assets->image_dead);
+    //draw_image(screen, assets->image_dead);
+    fill_screen(screen, assets->splash_color);
+
+    const char * text = "YOU DIED";
+    const Point size = measure_text(text);
+
+    Point dest = {(screen->w - size.x) / 2, (screen->h - size.y) / 2};
+    draw_text(screen, assets->image_font, dest, text);
 
     handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);

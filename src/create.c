@@ -110,6 +110,7 @@ extern void RepaintProceduralTextures( Assets * const assets
                                      )
 {
     assets->level_color = wall_color;
+    assets->splash_color = trap_color;
 
     fill_wall_tex( screen
                  , assets->wall_tex
@@ -194,7 +195,7 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->enemy_tex  = textures + 5 * tex_size;
 
     assets->image_dangerous = load_image("gfx/dangerous.png");
-    assets->image_dead      = load_image("gfx/dead.png");
+    assets->image_font      = load_image("gfx/font.png");
 
     const Color wall_color   = {255,  13,  51, 114};
     const Color floor_color  = {255,  65, 113, 191};

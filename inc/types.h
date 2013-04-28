@@ -76,6 +76,7 @@ typedef struct _Assets {
     int tex_height;
 
     Color level_color;
+    Color splash_color;
 
     Uint32 *wall_tex;
     Uint32 *floor_tex;
@@ -86,4 +87,5 @@ typedef struct _Assets {
 
     SDL_Surface *image_dangerous;
     SDL_Surface *image_dead;
+    SDL_Surface *image_font;
 } Assets;
