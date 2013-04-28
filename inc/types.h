@@ -24,7 +24,7 @@ typedef struct _Enemy {
 } Enemy;
 
 #define ENEMY_SPEED 5.0
-#define MAX_ENEMY_COUNT 4
+#define MAX_ENEMY_COUNT 8
 
 typedef enum _TileType { TILE_BOSS   = -4
                        , TILE_TRADER = -3
