@@ -83,6 +83,9 @@ int main(int argc, char **argv)
         behav.draw(state, screen, assets);
 
         keys = new_keys;
+        
+        int delay = 17 - (long)(now - then);
+        SDL_Delay(delay > 0 ? delay : 0);
     }
     
     printf("errorous errand occured: %s\n", SDL_GetError());
