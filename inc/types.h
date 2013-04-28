@@ -38,7 +38,7 @@ typedef enum _Item { ITEM_POTATO
                    , ITEM_SWORD
                    , ITEM_POISON
                    , ITEM_CHAINSAW
-                   , MAX_ITEM = ITEM_POISON
+                   , MAX_ITEM = ITEM_CHAINSAW
                    } Item;
 
 typedef enum _StateType { STATE_SPLASH

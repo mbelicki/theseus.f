@@ -447,10 +447,16 @@ extern void draw_boss( const State * const state
     int is_effective = state->player_item == ITEM_POTATO;
 
     const char * fst_says = "YOU USE YOUR";
-    char snd_says[32]; sprintf(snd_says, "%s, IT'S", player_item);
-    char thr_says[32]; sprintf(thr_says, "%s EFFECTIVE", 
-                    is_effective ? "SUPER" : "NOT");
-
+    char snd_says[32]; 
+    char thr_says[32]; 
+    if (state->player_item != ITEM_CHAINSAW) {
+        sprintf(snd_says, "%s, IT'S", player_item);
+        sprintf(thr_says, "%s EFFECTIVE", is_effective ? "SUPER" : "NOT");
+    } else {
+        sprintf(snd_says, "%s, IT", player_item);
+        sprintf(thr_says, "HAS NO GAS");
+    }
+    
     size = measure_text(fst_says);
     const Point fst_says_dest = {(screen->w - size.x) / 2, 272};
     draw_text(screen, assets->image_font, fst_says_dest, fst_says);

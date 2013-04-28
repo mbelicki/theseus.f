@@ -120,12 +120,12 @@ extern State *process_splash( State *state
     if (state->type == STATE_TRADE) {
         if (up_pressed) {
             state->player_item = state->trader_item;
-            state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
+            state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
             set_tile(state, TILE_FLOOR, 
                      state->player_pos.x, state->player_pos.y);
             change_state(state, STATE_FREE);
         } else if (down_pressed) {
-            state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
+            state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
             set_tile(state, TILE_FLOOR, 
                      state->player_pos.x, state->player_pos.y);
             change_state(state, STATE_FREE);

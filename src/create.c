@@ -225,7 +225,7 @@ State *create_initial_state()
     state->marquee_amount = 0.0;
     state->is_marquee_closing = 0;
 
-    state->player_pos.x = 1;
+    state->player_pos.x = 0;
     state->player_pos.y = 8;
     state->player_goto = state->player_prev_pos = state->player_pos;
 

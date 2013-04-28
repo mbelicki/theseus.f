@@ -236,11 +236,11 @@ static void render_maze( const Dir * const grid
             MAP_AT(i * 2, j * 2) = TILE_WALL;
             if ((dir & DIR_DOWN) == 0)
                 MAP_AT(i * 2 + 1, j * 2)
-                    = rand() % 8 == 0 ? TILE_TRAP : TILE_WALL;
+                    = rand() % 4 == 0 ? TILE_TRAP : TILE_WALL;
             
             if ((dir & DIR_LEFT) == 0)
                 MAP_AT(i * 2, j * 2 + 1)
-                    = rand() % 8 == 0 ? TILE_TRAP : TILE_WALL;
+                    = rand() % 4 == 0 ? TILE_TRAP : TILE_WALL;
             
             if (   dir == DIR_LEFT || dir == DIR_RIGHT
                 || dir == DIR_DOWN || dir == DIR_UP) {
