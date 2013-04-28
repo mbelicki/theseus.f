@@ -113,13 +113,28 @@ extern State *process_splash( State *state
                             , double time
                             )
 {
-    if (old_keys & KEY_UP) {
-        if ((new_keys & KEY_UP) == 0) {
-            StateType next
-                = state->type == STATE_SPLASH ? STATE_INTRO : STATE_FREE;
-            change_state(state, next);
+    if (state->type == STATE_TRADE) {
+        if (old_keys & KEY_UP && (new_keys & KEY_UP) == 0) {
+            state->player_item = state->trader_item;
+            state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
+            set_tile(state, TILE_FLOOR, 
+                     state->player_pos.x, state->player_pos.y);
+            change_state(state, STATE_FREE);
+        } else if (old_keys & KEY_DOWN && (new_keys & KEY_DOWN) == 0) {
+            state->trader_item = (state->trader_item + 1) % (MAX_ITEM + 1);
+            set_tile(state, TILE_FLOOR, 
+                     state->player_pos.x, state->player_pos.y);
+            change_state(state, STATE_FREE);
         }
+        return state;
     }
+    
+    if (old_keys & KEY_UP && (new_keys & KEY_UP) == 0) {
+        StateType next
+            = state->type == STATE_SPLASH ? STATE_INTRO : STATE_FREE;
+        change_state(state, next);
+    }
+
     return state;
 }
 

@@ -337,6 +337,15 @@ extern void draw_intro( const State * const state
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
+static const char *name_item(Item item)
+{
+    switch (item) {
+        case ITEM_POTATO: return "POTATO";
+        case ITEM_SWORD:  return "SWORD";
+        case ITEM_POISON: return "POISON";
+    }
+}
+
 extern void draw_trade( const State * const state   
                       , SDL_Surface * const screen
                       , const Assets * const assets
@@ -344,19 +353,45 @@ extern void draw_trade( const State * const state
 {
     draw_image(screen, assets->image_trader);
 
-    const char * text = "A WILD TAKING RAT APPEARS";
-    Point size = measure_text(text);
+    const char * fst_ln = "A WILD TALKING";
+    const char * snd_ln = "RAT APPEARS";
 
-    const Point dest = {16, (screen->h - size.y) / 2};
-    draw_text(screen, assets->image_font, dest, text);
+    Point size = measure_text(fst_ln);
+    const Point fst_dest = {(screen->w - size.x)/2, 16};
+    draw_text(screen, assets->image_font, fst_dest, fst_ln);
 
-    char says[64]; 
-    sprintf( says, "\"GIVE ME YOUR %s AND I'LL GIVE YOU THIS %s\""
-           , "POATATO", "SWORD");
-    size = measure_text(says);
+    size = measure_text(snd_ln);
+    const Point snd_dest = {(screen->w - size.x)/2, 48};
+    draw_text(screen, assets->image_font, snd_dest, snd_ln);
 
-    const Point says_dest = {128, (screen->h - size.y) / 2};
-    draw_text(screen, assets->image_font, says_dest, text);
+    const char * player_item = name_item(state->player_item);
+    const char * trader_item = name_item(state->trader_item);
+
+    const char * fst_says = "'GIVE ME YOUR";
+    char snd_says[32]; sprintf(snd_says, "%s TO GET", player_item);
+    char thr_says[32]; sprintf(thr_says, "THIS %s`", trader_item);
+
+    size = measure_text(fst_says);
+    const Point fst_says_dest = {(screen->w - size.x - 32) / 2, 256};
+    draw_text(screen, assets->image_font, fst_says_dest, fst_says);
+
+    size = measure_text(snd_says);
+    const Point snd_says_dest = {(screen->w - size.x) / 2, 256 + 48};
+    draw_text(screen, assets->image_font, snd_says_dest, snd_says);
+
+    size = measure_text(thr_says);
+    const Point thr_says_dest = {(screen->w - size.x) / 2, 256 + 2 * 48};
+    draw_text(screen, assets->image_font, thr_says_dest, thr_says);
+
+    Point key_yes = {64, 448};
+    Point cap_yes = {64 + 32 + 16, 448};
+    draw_key(screen, assets->image_font, key_yes, KEY_UP);
+    draw_text(screen, assets->image_font, cap_yes, "DEAL");
+
+    Point key_no = {screen->w - 64 - 32, 448};
+    Point cap_no = {key_no.x - 64 - 16, 448};
+    draw_key(screen, assets->image_font, key_no, KEY_DOWN);
+    draw_text(screen, assets->image_font, cap_no, "NO");
 
     handle_marquee(state, screen, assets);
     SDL_UpdateRect(screen, 0, 0, 0, 0);

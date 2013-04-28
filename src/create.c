@@ -230,6 +230,7 @@ State *create_initial_state()
     state->player_move_speed = 7.0; /* in tiles per second */
     
     state->player_item = ITEM_POTATO;
+    state->trader_item = ITEM_SWORD;
 
     state->map_data = NULL;
     state->map_enemies = malloc(sizeof(Enemy) * MAX_ENEMY_COUNT);

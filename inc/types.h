@@ -37,6 +37,7 @@ typedef enum _TileType { TILE_BOSS   = -4
 typedef enum _Item { ITEM_POTATO
                    , ITEM_SWORD
                    , ITEM_POISON
+                   , MAX_ITEM = ITEM_POISON
                    } Item;
 
 typedef enum _StateType { STATE_SPLASH
