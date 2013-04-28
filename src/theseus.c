@@ -43,7 +43,11 @@ static StateBehavior *get_behavior_table()
     return behaviors;
 }
 
+#ifdef __MINGW32__
+int WinMain(int argc, char **argv)
+#else
 int main(int argc, char **argv)
+#endif
 {
     srand(time(NULL));
     

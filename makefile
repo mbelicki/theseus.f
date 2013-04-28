@@ -1,6 +1,6 @@
 EMCC=~/sources/emscripten/emcc
 
-COMMON_OPTS=-lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -g -O3
+COMMON_OPTS=-lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -g -O3 -mwindows
 STATIC_LIB=-static-libgcc
 
 all: create.o draw.o levels.o generator.o logic.o src/theseus.c
