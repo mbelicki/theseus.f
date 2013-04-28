@@ -34,14 +34,44 @@ static TileType current_tile(const State * const state)
 }
 
 static void set_tile( State * const state
-             , const TileType t
-             , const int x
-             , const int y
-             )
+                    , const TileType t
+                    , const int x
+                    , const int y
+                    )
 {
     state->map_data[x + state->map_width * y] = t;
 }
 
+static void reset_player_position(State * const state) 
+{
+    const Point start_pos = {0, state->map_height / 2};
+
+    state->player_move_delta = 0.0;
+    state->player_pos      = start_pos;
+    state->player_goto     = start_pos;
+    state->player_prev_pos = start_pos;
+}
+
+static void clean_map(State * const state)
+{
+#define AT(x, y) \
+    (state->map_data[(x) + state->map_width * (y)])
+
+    for (int i = 0; i < state->map_width; i++) {
+        for (int j = 0; j < state->map_height; j++) {
+            if (AT(i, j) == TILE_STRING)
+                AT(i, j) = TILE_FLOOR;
+        }
+    }
+#undef AT
+}
+
+static void die(State * const state)
+{
+    state->type = STATE_LOST;
+    reset_player_position(state);
+    clean_map(state);
+}
 
 extern State *update_nop(State *state, Assets *assets, double time)
 {
@@ -56,7 +86,7 @@ extern State *process_splash( State *state
                             )
 {
     if (old_keys & KEY_UP) {
-        if ((new_keys & KEY_UP) != 0) {
+        if ((new_keys & KEY_UP) == 0) {
             state->type = STATE_FREE;
         }
     }
@@ -177,14 +207,14 @@ extern State *update_free( State * const state
 
     const int current = current_tile(state);
     if (current == TILE_TRAP) {
-        state->type = STATE_LOST;
+        die(state);
     }
 
     for (int i = 0; i < state->map_enemy_count; i++) {
         Enemy *enemy = state->map_enemies + i;
         update_enemy(enemy, state, time);
         if (POINT_EQ(state->player_pos, enemy->position)) {
-            state->type = STATE_LOST;
+            die(state);
         }
     }
         
