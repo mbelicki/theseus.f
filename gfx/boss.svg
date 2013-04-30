@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="boss.svg"
-   inkscape:export-filename="/home/mateusz/programming/c/theseus/gfx/trader.png"
+   inkscape:export-filename="/home/mateusz/programming/c/theseus/gfx/boss.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -244,7 +244,7 @@
     </g>
     <g
        id="g5771"
-       transform="matrix(1.0849668,0,0,1.0849668,-43.160378,-3.745023)">
+       transform="matrix(1.0849668,0,0,1.0849668,-43.160378,3.254977)">
       <path
          transform="matrix(1.0919919,0,0,1.4946383,-53.17995,-48.897934)"
          d="m 290.44563,132.71906 c 0,2.83454 -2.62171,5.1324 -5.85576,5.1324 -3.23404,0 -5.85575,-2.29786 -5.85575,-5.1324 0,-2.83455 2.62171,-5.13241 5.85575,-5.13241 3.23405,0 5.85576,2.29786 5.85576,5.13241 z"
