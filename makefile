@@ -1,5 +1,3 @@
-EMCC=~/sources/emscripten/emcc
-
 CC=gcc
 
 COMMON_OPTS=-lm -lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -O3
@@ -30,6 +28,3 @@ logic.o: src/logic.c
 
 clean:
 	rm -f *.o theseus
-
-javascript:
-	$(EMCC) src/*.c -Iinc -o theseus.html
