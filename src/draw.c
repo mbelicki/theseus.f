@@ -15,9 +15,9 @@ static void draw_enemy( Enemy * const enemy
     const int off_x = tile_size.x / 2;
     const int off_y = tile_size.y / 2;
 
-    const Point position    = enemy->position;
-    const Point destination = enemy->destination;
-    const double delta = (1 - enemy->movement_delta);
+    const Point position    = ENTITY_OF( enemy ).position;
+    const Point destination = ENTITY_OF( enemy ).destination;
+    const double delta = (1 - ENTITY_OF( enemy ).movement_delta);
     const int enemy_i
         = (int)(tile_size.x * (position.x 
                                 + delta * (destination.x - position.x)));
@@ -108,7 +108,7 @@ static void draw_map( const State * const state
             int u = (i + off_x) % assets->tex_width;
             int v = (j + off_y) % assets->tex_height;
             
-            int current_tile = state->map_data[x + state->map_width * y];
+            int current_tile = state->map.data[x + state->map.width * y];
             Uint32 *texture = NULL;
             if (current_tile == TILE_WALL) {
                 texture = assets->wall_tex;
@@ -271,8 +271,8 @@ extern void draw_free( const State * const state
                      , const Assets * const assets
                      )
 {
-    const Point tile_size = { screen->w / (state->map_width  - 1)
-                            , screen->h / (state->map_height - 1)
+    const Point tile_size = { screen->w / (state->map.width  - 1)
+                            , screen->h / (state->map.height - 1)
                             };
     
     draw_map(state, screen, assets, tile_size);

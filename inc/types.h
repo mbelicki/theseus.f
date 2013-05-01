@@ -15,24 +15,47 @@ typedef struct _Point {
 #define POINT_EQ(p1, p2)\
     ((p1).x == (p2).x && (p1).y == (p2).y)
 
+typedef enum _EntityFlags { ENTITY_HAS_HIT_WALL = 1
+                          } EntityFlags;
+
+typedef struct _Entity {
+    Point       position;
+    Point       destination;
+    double      movement_delta;
+    EntityFlags flags;
+} Entity;
+
+static inline Entity * init_entity( Entity * const e
+                                  , const int x
+                                  , const int y) {
+    e->position.x = e->destination.x = x; 
+    e->position.y = e->destination.y = y; 
+    e->movement_delta = 0.0;
+    e->flags = 0;
+    return e;
+}
+
+#define ENTITY_IN(a) ((a).entity)
+#define ENTITY_OF(a) ((a)->entity)
+
+#define IS_ENTITY Entity entity
+
+typedef enum _EnemyFlags { ENEMY_MOVING_HORIZONTAL = 1
+                         , ENEMY_GOING_BACK        = 2
+                         } EnemyFlags;
+
 typedef struct _Enemy {
-    Point  position;
-    Point  destination;
-    double movement_delta;
-    int    is_moving_horizontal;
-    int    is_going_back;
+    IS_ENTITY;
+    EnemyFlags flags;
 } Enemy;
 
-#define ENEMY_SPEED 5.0
-#define MAX_ENEMY_COUNT 8
-
-typedef enum _TileType { TILE_BOSS   = -4
-                       , TILE_TRADER = -3
-                       , TILE_STRING = -2
-                       , TILE_TRAP   = -1
-                       , TILE_FLOOR  =  0
-                       , TILE_WALL   =  1
-                       } TileType;
+static inline Enemy * init_enemy( Enemy * const e
+                                , const int x
+                                , const int y) {
+    init_entity( & e->entity, x, y );
+    e->flags = 0;
+    return e;
+}
 
 typedef enum _Item { ITEM_POTATO
                    , ITEM_SWORD
@@ -40,6 +63,32 @@ typedef enum _Item { ITEM_POTATO
                    , ITEM_CHAINSAW
                    , MAX_ITEM = ITEM_CHAINSAW
                    } Item;
+
+typedef struct _Player {
+    IS_ENTITY;
+} Player;
+
+#define ENEMY_SPEED 5.0
+#define MAX_ENEMY_COUNT 8
+
+typedef enum _TileType { TILE_FLOOR  =  0
+                       , TILE_WALL   =  1
+                       , TILE_TRAP   =  2
+                       , TILE_STRING =  4
+                       , TILE_TRADER =  8
+                       , TILE_BOSS   = 16
+                       } TileType;
+
+typedef enum _MapFlags { MAP_DYNAMIC = 1
+                       } MapFlags;
+
+typedef struct _Map {
+    TileType *data;
+    size_t    width;
+    size_t    height;
+    
+    MapFlags  flags;
+} Map;
 
 typedef enum _StateType { STATE_SPLASH
                         , STATE_INTRO
@@ -56,10 +105,7 @@ typedef struct _State {
     StateType type;
     StateType next_type;
 
-    int       map_is_dynamic;
-    TileType *map_data;
-    int       map_width;
-    int       map_height;
+    Map       map;
     Enemy    *map_enemies;
     size_t    map_enemy_count;
 

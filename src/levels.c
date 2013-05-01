@@ -22,13 +22,16 @@
 //    , $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $ 
 //    };
 
-#define $ 1
-#define T -1
-#define S -3
-#define B -4
-#define _ 0
-#define v -5
-#define h -6
+#define SPAWNER_V_ENEMY -5
+#define SPAWNER_H_ENEMY -6
+
+#define $ TILE_WALL
+#define T TILE_TRAP
+#define S TILE_TRADER
+#define B TILE_BOSS
+#define _ TILE_FLOOR
+#define v SPAWNER_V_ENEMY
+#define h SPAWNER_H_ENEMY
 
 static TileType hello[] =
     { $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $
@@ -163,18 +166,19 @@ static void find_enemies(State * const state)
     int e = 0;
 
 #define MAP_AT(x, y)\
-    (state->map_data[(x) + state->map_width * (y)])
+    (state->map.data[(x) + state->map.width * (y)])
 
-    for (int i = 0; i < state->map_width; i++) {
-        for (int j = 0; j < state->map_height; j++) {
+    for ( int i = 0; i < state->map.width; i++ ) {
+        for ( int j = 0; j < state->map.height; j++ ) {
             const int tile = MAP_AT(i, j);
-            if (tile == -5) {
-                Enemy enemy = {{i, j}, {i, j}, 0.0, 0, 0};
+            if ( tile == SPAWNER_V_ENEMY ) {
+                Enemy enemy; init_enemy( &enemy, i, j );
                 state->map_enemies[e] = enemy;
                 MAP_AT(i, j) = TILE_FLOOR;
                 e++;
-            } else if (tile == -6) {
-                Enemy enemy = {{i, j}, {i, j}, 0.0, 1, 0};
+            } else if ( tile == SPAWNER_H_ENEMY ) {
+                Enemy enemy; init_enemy( &enemy, i, j );
+                enemy.flags |= ENEMY_MOVING_HORIZONTAL;
                 state->map_enemies[e] = enemy;
                 MAP_AT(i, j) = TILE_FLOOR;
                 e++;
@@ -208,23 +212,23 @@ void change_level( State * const state
                  , const int level
                  )
 {
-    if (state->map_data != NULL && state->map_is_dynamic) {
-        free(state->map_data);
+    if (state->map.data != NULL && state->map.flags & MAP_DYNAMIC) {
+        free(state->map.data);
     }
         
-    state->map_width  = 17;
-    state->map_height = 17;
-    const int map_size = state->map_width * state->map_height;
+    state->map.width  = 17;
+    state->map.height = 17;
+    const size_t map_size = state->map.width * state->map.height;
 
     if (level % (RANDOM_BETWEEN + 1) == 1) {
-        state->map_data = pick_nonrandom(level);
-        state->map_is_dynamic = 0;
+        state->map.data = pick_nonrandom(level);
+        state->map.flags = 0;
     } else {
-        state->map_is_dynamic = 1;
-        state->map_data = malloc(sizeof(TileType) * map_size);
-        if (state->map_data == NULL) return;
+        state->map.flags = MAP_DYNAMIC;
+        state->map.data = malloc(sizeof(TileType) * map_size);
+        if (state->map.data == NULL) return;
 
-        fill_with_maze(state->map_data, state->map_width, state->map_height);
+        fill_with_maze(state->map.data, state->map.width, state->map.height);
     }
     
     find_enemies(state);
