@@ -22,14 +22,18 @@ typedef struct _Entity {
     Point       position;
     Point       destination;
     double      movement_delta;
+    double      speed;
     EntityFlags flags;
 } Entity;
+
+#define DEFAULT_SPEED 5.0
 
 static inline Entity * init_entity( Entity * const e
                                   , const int x
                                   , const int y) {
     e->position.x = e->destination.x = x; 
     e->position.y = e->destination.y = y; 
+    e->speed = DEFAULT_SPEED;
     e->movement_delta = 0.0;
     e->flags = 0;
     return e;
@@ -68,7 +72,6 @@ typedef struct _Player {
     IS_ENTITY;
 } Player;
 
-#define ENEMY_SPEED 5.0
 #define MAX_ENEMY_COUNT 8
 
 typedef enum _TileType { TILE_FLOOR  =  0

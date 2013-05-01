@@ -230,7 +230,7 @@ static void update_entity( Entity * const entity
             entity->destination = entity->position;
             entity->flags |= ENTITY_HAS_HIT_WALL;
         } else {
-            entity->movement_delta -= ENEMY_SPEED * time;
+            entity->movement_delta -= entity->speed * time;
             if ( entity->movement_delta <= 0.0 ) {
                 entity->movement_delta = 0.0;
                 entity->position = entity->destination;
