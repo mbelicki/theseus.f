@@ -15,6 +15,9 @@ typedef struct _Point {
 #define POINT_EQ(p1, p2)\
     ((p1).x == (p2).x && (p1).y == (p2).y)
 
+#define POINT_EQ(p1, p2)\
+    ((p1).x == (p2).x && (p1).y == (p2).y)
+
 typedef enum _EntityFlags { ENTITY_HAS_HIT_WALL = 1
                           } EntityFlags;
 
@@ -70,6 +73,7 @@ typedef enum _Item { ITEM_POTATO
 
 typedef struct _Player {
     IS_ENTITY;
+    Item item;
 } Player;
 
 #define MAX_ENEMY_COUNT 8
@@ -114,12 +118,8 @@ typedef struct _State {
 
     int current_level_no;
 
-    Point  player_pos;
-    Point  player_goto;
+    Player player;
     Point  player_prev_pos;
-    double player_move_delta;
-    double player_move_speed;
-    Item   player_item;
 
     Item   trader_item;
 

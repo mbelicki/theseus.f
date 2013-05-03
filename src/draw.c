@@ -56,9 +56,9 @@ static void draw_player( const State * const state
     const int off_x = tile_size.x / 2;
     const int off_y = tile_size.y / 2;
 
-    const Point player_pos  = state->player_pos;
-    const Point player_goto = state->player_goto;
-    const double delta = (1 - state->player_move_delta);
+    const Point player_pos  = ENTITY_IN( state->player ).position;
+    const Point player_goto = ENTITY_IN( state->player ).destination;
+    const double delta = (1 - ENTITY_IN( state->player ).movement_delta);
     const int player_i
         = (int)(tile_size.x * (player_pos.x 
                                 + delta * (player_goto.x - player_pos.x)));
@@ -390,7 +390,7 @@ extern void draw_trade( const State * const state
     const Point snd_dest = {(screen->w - size.x)/2, 48};
     draw_text(screen, assets->image_font, snd_dest, snd_ln);
 
-    const char * player_item = name_item(state->player_item);
+    const char * player_item = name_item(state->player.item);
     const char * trader_item = name_item(state->trader_item);
 
     const char * fst_says = "\"GIVE ME YOUR";
@@ -441,15 +441,14 @@ extern void draw_boss( const State * const state
     const Point snd_dest = {(screen->w - size.x)/2, 48};
     draw_text(screen, assets->image_font, snd_dest, snd_ln);
 
-    const char * player_item = name_item(state->player_item);
-    const char * trader_item = name_item(state->trader_item);
+    const char * player_item = name_item(state->player.item);
 
-    int is_effective = state->player_item == ITEM_POTATO;
+    int is_effective = state->player.item == ITEM_POTATO;
 
     const char * fst_says = "YOU USE YOUR";
     char snd_says[32]; 
     char thr_says[32]; 
-    if (state->player_item != ITEM_CHAINSAW) {
+    if (state->player.item != ITEM_CHAINSAW) {
         sprintf(snd_says, "%s, IT'S", player_item);
         sprintf(thr_says, "%s EFFECTIVE", is_effective ? "SUPER" : "NOT");
     } else {
