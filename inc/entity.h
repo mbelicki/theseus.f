@@ -58,6 +58,11 @@ extern Entity * init_entity( Entity * const e
                            , const int y
                            );
 
+extern Player * init_player( Player * const p
+                           , const int x
+                           , const int y
+                           );
+
 extern int is_moving( const Entity * const entity );
 extern void cancel_move( Entity * const entity );
 extern void complete_move( Entity * const entity );

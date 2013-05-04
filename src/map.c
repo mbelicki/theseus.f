@@ -45,7 +45,7 @@ extern void substitute_tiles( Map * const map
 #undef AT
 }
 
-extern void delete_map_data( Map * const map )
+extern void clean_map_data( Map * const map )
 {
     if ( map->flags & MAP_DYNAMIC ) {
         free( map->data );
@@ -54,6 +54,8 @@ extern void delete_map_data( Map * const map )
     free( map->inital_enemy_states );
 
     map->data = NULL;
+    map->inital_enemy_states = NULL;
+
     map->width = map->height = 0;
     map->flags = 0;
     map->enemies_count = 0;

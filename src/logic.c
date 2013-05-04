@@ -1,4 +1,6 @@
 #include <SDL/SDL.h>
+#include <string.h> /* memcpy */
+
 #include "logic.h"
 #include "state.h"
 #include "map.h"
@@ -29,9 +31,25 @@ static TileType current_tile(const State * const state)
     return state->map.data[ pos.x + state->map.width * pos.y ];
 }
 
-static inline void reset_player_position(State * const state) 
+static void reset_enemies( State * const state )
 {
+    const size_t size = sizeof( Enemy ) * state->map.enemies_count;
+    /* TODO: reallocation is not always neeeded */
+    free( state->enemies );
+    state->enemies = malloc( size );
+    if ( state->enemies == NULL ) return;
+
+    printf( "mam enenmy count is: %lu\n", state->map.enemies_count );
+
+    memcpy( state->enemies, state->map.inital_enemy_states, size );
+    state->enemies_count = state->map.enemies_count;
+}
+
+static inline void reset_player_position( State * const state ) 
+{
+    double speed = ENTITY_IN( state->player ).speed;
     init_entity( & ENTITY_IN( state->player ), 0, state->map.height / 2);
+    ENTITY_IN( state->player ).speed = speed;
 }
 
 static void clean_map(Map * const map)
@@ -49,6 +67,7 @@ static void die(State * const state)
 {
     change_state( state, STATE_LOST );
     reset_player_position( state );
+    reset_enemies( state );
     clean_map( & state->map );
 }
 
@@ -155,11 +174,6 @@ extern State *process_free( State * const state
         const int current     = current_tile(state);
         const int antydest    = antydestination_tile(state);
 
-        //const int neighbors_string = has_neighboring( & state->map
-        //                                            , TILE_STRING
-        //                                            , player_entity->position
-        //                                            );
-
         if ( ( ! POINT_EQ( player_entity->destination
                          , player_entity->previous_position
                          ) )
@@ -237,17 +251,21 @@ extern State *update_free( State * const state
 
     if (player_entity->position.x == state->map.width - 1) {
         state->current_level_no += 1;
+
+        clean_map_data( & state-> map );
         change_level( & state->map, state->current_level_no );
+        reset_enemies( state );
+        
         player_entity->position.x = 0;
         player_entity->destination 
             = player_entity->previous_position = player_entity->position;
     }
 
-    for (int i = 0; i < state->map_enemy_count; i++) {
-        Enemy *enemy = state->map_enemies + i;
+    for (int i = 0; i < state->enemies_count; i++) {
+        Enemy *enemy = state->enemies + i;
         update_enemy(enemy, state, time);
         if ( POINT_EQ( ENTITY_IN( state->player ).position
-                     , ENTITY_OF(enemy ).position
+                     , ENTITY_OF( enemy ).position
                      ) ) {
             die(state);
         }

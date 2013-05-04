@@ -44,5 +44,5 @@ extern void substitute_tiles( Map * const map
                             , const TileType new_tile
                             );
 
-extern void clear_map( Map * const map );
+extern void clean_map_data( Map * const map );
 extern void change_level( Map * const map, const int level );

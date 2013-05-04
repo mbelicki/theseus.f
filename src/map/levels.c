@@ -179,13 +179,14 @@ extern void find_enemies( Map * const map )
         for ( int j = 0; j < map->height; j++ ) {
             const int tile = MAP_AT(i, j);
             
-            if (tile != SPAWNER_V_ENEMY || tile != SPAWNER_H_ENEMY)
+            if (tile != SPAWNER_V_ENEMY && tile != SPAWNER_H_ENEMY)
                 continue;
 
             MAP_AT(i, j) = TILE_FLOOR;
             
             init_enemy( &enemy, i, j );
-            enemy.flags |= ENEMY_MOVING_HORIZONTAL;
+            if (tile == SPAWNER_H_ENEMY)
+                enemy.flags |= ENEMY_MOVING_HORIZONTAL;
             /* growing buffer */
             if ( found_count >= buffer_capacity ) {
                 buffer_capacity += chunk_size;

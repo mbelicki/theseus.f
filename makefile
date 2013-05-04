@@ -1,6 +1,6 @@
 CC=gcc
 
-COMMON_OPTS=-lm -lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -O3
+COMMON_OPTS=-lm -lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -O3 -g
 WINDOWS_OPTS=-mwindows
 
 all: create.o draw.o logic.o map.o entity.o src/theseus.c

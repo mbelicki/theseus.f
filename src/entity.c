@@ -21,11 +21,13 @@ extern Enemy * init_enemy( Enemy * const e
     e->flags = 0;
     return e;
 }
+
 extern Player * init_player( Player * const p
                            , const int x
                            , const int y
                            ) {
     init_entity( & p->entity, x, y );
+    ENTITY_OF( p ).speed = 7.0;
     p->item = ITEM_POTATO;
     return p;
 }
