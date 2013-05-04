@@ -20,19 +20,11 @@ extern State *create_initial_state()
     state->is_marquee_closing = 0;
 
     init_player( & state->player, 0, 8 );
-    
-    state->player.item = ITEM_POTATO;
     state->trader_item = ITEM_SWORD;
 
-    state->map.data = NULL;
+    change_level( & state->map, 0 );
 
     return state;
-}
-
-static TileType destination_tile(const State * const state)
-{
-    const Point dst = state->player.entity.destination;
-    return state->map.data[ dst.x + state->map.width * dst.y ];
 }
 
 static TileType antydestination_tile(const State * const state)
@@ -47,12 +39,6 @@ static TileType antydestination_tile(const State * const state)
     const int y = pos.y - dy;
 
     return state->map.data[ x + state->map.width * y ];
-}
-
-static TileType current_tile(const State * const state)
-{
-    const Point pos = state->player.entity.position;
-    return state->map.data[ pos.x + state->map.width * pos.y ];
 }
 
 static void reset_enemies( State * const state )
@@ -72,7 +58,7 @@ static inline void reset_player_position( State * const state )
 {
     init_entity( & state->player.entity
                , 0, state->map.height / 2
-               , state->player.entity.speed
+               , PLAYER_SPEED
                );
 }
 
@@ -196,8 +182,10 @@ extern State *process_free( State * const state
     }
 
     if ( moved ) {
-        const int destination = destination_tile(state);
-        const int current     = current_tile(state);
+        const int destination = tile_at( & state->map
+                                       , player_entity->destination );
+        const int current     = tile_at( & state->map
+                                       , player_entity->position );
         const int antydest    = antydestination_tile(state);
 
         if ( ( ! POINT_EQ( player_entity->destination
@@ -264,7 +252,7 @@ extern State *update_free( State * const state
     TileType dst_tile = update_entity( player_entity, & state->map, 
                                        non_walkable, time );
 
-    const int current = current_tile(state);
+    const int current = tile_at( & state->map, player_entity->position );
     if (current == TILE_TRAP) {
         die(state);
     } else if (current == TILE_TRADER) {

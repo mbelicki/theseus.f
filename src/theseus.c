@@ -8,7 +8,6 @@
 #include "assets.h"
 #include "draw.h"
 #include "logic.h"
-#include "map.h"
 
 int get_keyboard(void);
 int is_not_done(const State * const state);
@@ -66,7 +65,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    change_level( & state->map, 0 );
     StateBehavior *behaviors = get_behavior_table();
 
     while ( is_not_done( state ) ) {

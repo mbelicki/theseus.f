@@ -1,5 +1,4 @@
 #include <SDL/SDL.h>
-#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "draw.h"

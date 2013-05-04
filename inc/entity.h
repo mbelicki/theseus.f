@@ -41,7 +41,7 @@ typedef struct _Player {
     Item   item;
 } Player;
 
-#define PLAYER_SPEED 5.0
+#define PLAYER_SPEED 7.0
 
 /* functions: */
 
