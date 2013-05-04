@@ -31,14 +31,14 @@ extern State *create_initial_state()
 
 static TileType destination_tile(const State * const state)
 {
-    const Point dst = ENTITY_IN( state->player ).destination;
+    const Point dst = state->player.entity.destination;
     return state->map.data[ dst.x + state->map.width * dst.y ];
 }
 
 static TileType antydestination_tile(const State * const state)
 {
-    const Point dst = ENTITY_IN( state->player ).destination;
-    const Point pos = ENTITY_IN( state->player ).position;
+    const Point dst = state->player.entity.destination;
+    const Point pos = state->player.entity.position;
 
     const int dx = dst.x - pos.x;
     const int dy = dst.y - pos.y;
@@ -51,7 +51,7 @@ static TileType antydestination_tile(const State * const state)
 
 static TileType current_tile(const State * const state)
 {
-    const Point pos = ENTITY_IN( state->player ).position;
+    const Point pos = state->player.entity.position;
     return state->map.data[ pos.x + state->map.width * pos.y ];
 }
 
@@ -70,9 +70,10 @@ static void reset_enemies( State * const state )
 
 static inline void reset_player_position( State * const state ) 
 {
-    double speed = ENTITY_IN( state->player ).speed;
-    init_entity( & ENTITY_IN( state->player ), 0, state->map.height / 2);
-    ENTITY_IN( state->player ).speed = speed;
+    init_entity( & state->player.entity
+               , 0, state->map.height / 2
+               , state->player.entity.speed
+               );
 }
 
 static void clean_map(Map * const map)
@@ -136,13 +137,15 @@ extern State *process_splash( State *state
         if ( up_pressed ) {
             state->player.item = state->trader_item;
             state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
-            set_tile( & state->map, TILE_FLOOR, 
-                      ENTITY_IN( state->player ).position );
+            set_tile( & state->map, TILE_FLOOR
+                    , state->player.entity.position
+                    );
             change_state( state, STATE_FREE );
         } else if ( down_pressed ) {
             state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
-            set_tile( & state->map, TILE_FLOOR, 
-                      ENTITY_IN( state->player ).position );
+            set_tile( & state->map, TILE_FLOOR
+                    , state->player.entity.position
+                    );
             change_state( state, STATE_FREE );
         }
     } else if ( state->type == STATE_BOSS ) {
@@ -173,7 +176,7 @@ extern State *process_free( State * const state
                           , const double time
                           )
 {
-    Entity * const player_entity = & ENTITY_IN( state->player );
+    Entity * const player_entity = & state->player.entity;
     int moved = 0;
 
     if ( is_moving( player_entity ) == 0 ) {
@@ -220,9 +223,8 @@ extern State *process_free( State * const state
     return state;
 }
 
-
 static void update_enemy( Enemy * const enemy
-                        , const State * const state
+                        , const Map * const map
                         , const double time
                         )
 {
@@ -230,25 +232,25 @@ static void update_enemy( Enemy * const enemy
     const int is_going_back = enemy->flags & ENEMY_GOING_BACK;
     
     /* update the target testination */
-    if ( is_moving( & ENTITY_OF( enemy ) ) == 0 ) {
+    if ( is_moving( & enemy->entity ) == 0 ) {
         const int delta = is_going_back ? 1 : -1;
         if ( is_horizontal ) {
-            ENTITY_OF( enemy ).destination.x += delta;
+            enemy->entity.destination.x += delta;
         } else {
-            ENTITY_OF( enemy ).destination.y += delta;
+            enemy->entity.destination.y += delta;
         }
     }
     /* do the walking */
     const TileType non_walkable = TILE_WALL | TILE_STRING | TILE_TRAP;
-    update_entity( & ENTITY_OF( enemy ), & state->map, non_walkable, time );
+    update_entity( & enemy->entity, map, non_walkable, time );
     /* handle wall hit */
-    if ( ENTITY_OF( enemy ).flags & ENTITY_HAS_HIT_WALL ) {
+    if ( enemy->entity.flags & ENTITY_HAS_HIT_WALL ) {
         if ( is_going_back ) {
             enemy->flags &= ~ENEMY_GOING_BACK;
         } else {
             enemy->flags |= ENEMY_GOING_BACK;
         }
-        ENTITY_OF( enemy ).flags &= ~ENTITY_HAS_HIT_WALL;
+        enemy->entity.flags &= ~ENTITY_HAS_HIT_WALL;
     }
 }
 
@@ -256,7 +258,7 @@ extern State *update_free( State * const state
                          , const double time
                          )
 {
-    Entity * const player_entity = & ENTITY_IN( state->player );
+    Entity * const player_entity = & state->player.entity;
 
     const TileType non_walkable = TILE_WALL;
     TileType dst_tile = update_entity( player_entity, & state->map, 
@@ -285,9 +287,9 @@ extern State *update_free( State * const state
 
     for (int i = 0; i < state->enemies_count; i++) {
         Enemy *enemy = state->enemies + i;
-        update_enemy(enemy, state, time);
-        if ( POINT_EQ( ENTITY_IN( state->player ).position
-                     , ENTITY_OF( enemy ).position
+        update_enemy(enemy, & state->map, time);
+        if ( POINT_EQ( state->player.entity.position
+                     , enemy->entity.position
                      ) ) {
             die(state);
         }

@@ -3,11 +3,12 @@
 extern Entity * init_entity( Entity * const e
                            , const int x
                            , const int y
+                           , const double speed
                            ) {
     e->position.x = e->destination.x = x; 
     e->position.y = e->destination.y = y; 
     e->previous_position = e->position;
-    e->speed = DEFAULT_SPEED;
+    e->speed = speed;
     e->movement_delta = 0.0;
     e->flags = 0;
     return e;
@@ -17,7 +18,7 @@ extern Enemy * init_enemy( Enemy * const e
                          , const int x
                          , const int y
                          ) {
-    init_entity( & e->entity, x, y );
+    init_entity( & e->entity, x, y, DEFAULT_SPEED );
     e->flags = 0;
     return e;
 }
@@ -26,8 +27,7 @@ extern Player * init_player( Player * const p
                            , const int x
                            , const int y
                            ) {
-    init_entity( & p->entity, x, y );
-    ENTITY_OF( p ).speed = 7.0;
+    init_entity( & p->entity, x, y, PLAYER_SPEED );
     p->item = ITEM_POTATO;
     return p;
 }

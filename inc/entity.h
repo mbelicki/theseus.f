@@ -20,17 +20,12 @@ typedef struct _Entity {
 
 #define DEFAULT_SPEED 5.0
 
-#define ENTITY_IN(a) ((a).entity)
-#define ENTITY_OF(a) ((a)->entity)
-
-#define IS_ENTITY Entity entity
-
 typedef enum _EnemyFlags { ENEMY_MOVING_HORIZONTAL = 1
                          , ENEMY_GOING_BACK        = 2
                          } EnemyFlags;
 
 typedef struct _Enemy {
-    IS_ENTITY;
+    Entity     entity;
     EnemyFlags flags;
 } Enemy;
 
@@ -42,21 +37,24 @@ typedef enum _Item { ITEM_POTATO
                    } Item;
 
 typedef struct _Player {
-    IS_ENTITY;
-    Item item;
+    Entity entity;
+    Item   item;
 } Player;
 
+#define PLAYER_SPEED 5.0
+
 /* functions: */
+
+extern Entity * init_entity( Entity * const e
+                           , const int x
+                           , const int y
+                           , const double speed
+                           );
 
 extern Enemy * init_enemy( Enemy * const e
                          , const int x
                          , const int y
                          );
-
-extern Entity * init_entity( Entity * const e
-                           , const int x
-                           , const int y
-                           );
 
 extern Player * init_player( Player * const p
                            , const int x

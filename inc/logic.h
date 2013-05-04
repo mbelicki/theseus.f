@@ -7,7 +7,7 @@ extern State *create_initial_state();
 extern int is_marquee_on( const State * const state );
 extern void handle_marquee( State * const state, const double time );
 
-extern State *update_nop( State * const state, double time );
+extern State  *update_nop( State * const state, const double time );
 extern State *update_free( State * const state, const double time);
 
 extern State *process_splash( State * const state

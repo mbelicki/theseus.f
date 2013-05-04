@@ -10,14 +10,12 @@ static void draw_enemy( Enemy * const enemy
                       , const Point tile_size
                       )
 {
-    Uint32 *pixels = screen->pixels;
-    
     const int off_x = tile_size.x / 2;
     const int off_y = tile_size.y / 2;
 
-    const Point position    = ENTITY_OF( enemy ).position;
-    const Point destination = ENTITY_OF( enemy ).destination;
-    const double delta = (1 - ENTITY_OF( enemy ).movement_delta);
+    const Point position    = enemy->entity.position;
+    const Point destination = enemy->entity.destination;
+    const double delta = (1 - enemy->entity.movement_delta);
     const int enemy_i
         = (int)(tile_size.x * (position.x 
                                 + delta * (destination.x - position.x)));
@@ -26,6 +24,8 @@ static void draw_enemy( Enemy * const enemy
                                 + delta * (destination.y - position.y)));
   
 #ifdef PROCEDURAL_ENEMY    
+    Uint32 *pixels = screen->pixels;
+    
     for (int i = 0; i < assets->tex_width; i++) {
         for (int j = 0; j < assets->tex_height; j++) {
             const int x = enemy_i + i - off_x;
@@ -45,20 +45,18 @@ static void draw_enemy( Enemy * const enemy
 
 }
 
-static void draw_player( const State * const state
+static void draw_player( const Player * const player
                        , SDL_Surface * const screen
                        , const Assets * const assets
                        , const Point tile_size
                        )
 {
-    Uint32 *pixels = screen->pixels;
-    
     const int off_x = tile_size.x / 2;
     const int off_y = tile_size.y / 2;
 
-    const Point player_pos  = ENTITY_IN( state->player ).position;
-    const Point player_goto = ENTITY_IN( state->player ).destination;
-    const double delta = (1 - ENTITY_IN( state->player ).movement_delta);
+    const Point player_pos  = player->entity.position;
+    const Point player_goto = player->entity.destination;
+    const double delta = (1 - player->entity.movement_delta);
     const int player_i
         = (int)(tile_size.x * (player_pos.x 
                                 + delta * (player_goto.x - player_pos.x)));
@@ -67,6 +65,8 @@ static void draw_player( const State * const state
                                 + delta * (player_goto.y - player_pos.y)));
     
 #ifdef PROCEDURAL_PLAYER    
+    Uint32 *pixels = screen->pixels;
+    
     for (int i = 0; i < assets->tex_width; i++) {
         for (int j = 0; j < assets->tex_height; j++) {
             const size_t x = player_i + i - off_x;
@@ -275,8 +275,8 @@ extern void draw_free( const State * const state
                             , screen->h / (state->map.height - 1)
                             };
     
-    draw_map(state, screen, assets, tile_size);
-    draw_player(state, screen, assets, tile_size);
+    draw_map( state, screen, assets, tile_size );
+    draw_player( & state->player, screen, assets, tile_size );
 
     for (int i = 0; i < state->enemies_count; i++) {
         draw_enemy(&state->enemies[i], screen, assets, tile_size);

@@ -34,6 +34,5 @@ map.levels.o: src/map/levels.c
 map.generator.o: src/map/generator.c
 	$(CC) src/map/generator.c -o map.generator.o -c $(COMMON_OPTS)
 
-
 clean:
 	rm -f *.o theseus
