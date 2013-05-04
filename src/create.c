@@ -2,7 +2,7 @@
 #include <SDL/SDL_image.h>
 
 #include "create.h"
-#include "levels.h"
+#include "map.h"
 
 SDL_Surface *get_screen( const int width
                        , const int height
@@ -225,10 +225,6 @@ State *create_initial_state()
     state->marquee_amount = 0.0;
     state->is_marquee_closing = 0;
 
-    //state->player_pos.x = 0;
-    //state->player_pos.y = 8;
-    //state->player_goto = state->player_prev_pos = state->player_pos;
-    
     init_entity( & ENTITY_IN( state->player ), 0, 8 );
     ENTITY_IN( state->player ).speed = 7.0; /* in tiles per second */
     

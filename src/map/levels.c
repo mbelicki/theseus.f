@@ -1,7 +1,5 @@
-#include <SDL/SDL.h>
-
-#include "levels.h"
-#include "generator.h"
+#include "map/levels.h"
+#include "entity.h"
 
 //    { $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $, $
 //    , $, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, $ 
@@ -161,43 +159,58 @@ static TileType arena[] =
 #undef v
 #undef h
 
-static void find_enemies(State * const state)
+/* TODO: general purpose growing array (like std::vector form STL) is needed */
+extern void find_enemies( Map * const map )
 {
-    int e = 0;
+    const size_t chunk_size = 8;
+    const size_t element_size = sizeof( Enemy );
+    size_t buffer_capacity = chunk_size;
+    size_t found_count = 0;
+
+    Enemy enemy;
+
+    Enemy *buffer = malloc( element_size * buffer_capacity );
+    if (buffer == NULL) return;
 
 #define MAP_AT(x, y)\
-    (state->map.data[(x) + state->map.width * (y)])
+    (map->data[(x) + map->width * (y)])
 
-    for ( int i = 0; i < state->map.width; i++ ) {
-        for ( int j = 0; j < state->map.height; j++ ) {
+    for ( int i = 0; i < map->width; i++ ) {
+        for ( int j = 0; j < map->height; j++ ) {
             const int tile = MAP_AT(i, j);
-            if ( tile == SPAWNER_V_ENEMY ) {
-                Enemy enemy; init_enemy( &enemy, i, j );
-                state->map_enemies[e] = enemy;
-                MAP_AT(i, j) = TILE_FLOOR;
-                e++;
-            } else if ( tile == SPAWNER_H_ENEMY ) {
-                Enemy enemy; init_enemy( &enemy, i, j );
-                enemy.flags |= ENEMY_MOVING_HORIZONTAL;
-                state->map_enemies[e] = enemy;
-                MAP_AT(i, j) = TILE_FLOOR;
-                e++;
-            }
+            
+            if (tile != SPAWNER_V_ENEMY || tile != SPAWNER_H_ENEMY)
+                continue;
 
-            if (e == MAX_ENEMY_COUNT) break;
+            MAP_AT(i, j) = TILE_FLOOR;
+            
+            init_enemy( &enemy, i, j );
+            enemy.flags |= ENEMY_MOVING_HORIZONTAL;
+            /* growing buffer */
+            if ( found_count >= buffer_capacity ) {
+                buffer_capacity += chunk_size;
+                buffer = realloc( buffer, element_size * buffer_capacity );
+                if (buffer == NULL) return;
+            }
+            
+            buffer[ found_count ] = enemy;
+            found_count = found_count + 1;
         }
     }
-#undef MAP_AT
 
-    state->map_enemy_count = e;
+#undef MAP_AT
+    /* trim buffer and save it */
+    buffer = realloc( buffer, element_size * found_count );
+    if (buffer == NULL) return;
+    
+    map->inital_enemy_states = buffer;
+    map->enemies_count = found_count;
 }
 
-#define RANDOM_BETWEEN 1
-
-static TileType *pick_nonrandom(const int level)
+extern TileType *pick_nonrandom( const int level )
 {
-    const int k = level / (RANDOM_BETWEEN + 1);
-    switch (k) {
+    const int k = level / ( RANDOM_BETWEEN_COUNT + 1 );
+    switch ( k ) {
         case 0:  return mess; 
         case 1:  return hello;
         case 2:  return sliders; 
@@ -207,31 +220,3 @@ static TileType *pick_nonrandom(const int level)
     }
 }
 
-void change_level( State * const state
-                 , Assets * const assets
-                 , const int level
-                 )
-{
-    if (state->map.data != NULL && state->map.flags & MAP_DYNAMIC) {
-        free(state->map.data);
-    }
-        
-    state->map.width  = 17;
-    state->map.height = 17;
-    const size_t map_size = state->map.width * state->map.height;
-
-    if (level % (RANDOM_BETWEEN + 1) == 1) {
-        state->map.data = pick_nonrandom(level);
-        state->map.flags = 0;
-    } else {
-        state->map.flags = MAP_DYNAMIC;
-        state->map.data = malloc(sizeof(TileType) * map_size);
-        if (state->map.data == NULL) return;
-
-        fill_with_maze(state->map.data, state->map.width, state->map.height);
-    }
-    
-    find_enemies(state);
-
-    state->current_level_no = level;
-}

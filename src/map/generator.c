@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <SDL/SDL.h>
 
-#include "generator.h"
+#include "map/generator.h"
 
 typedef enum _dir {
     DIR_UP    = 1,
@@ -143,18 +143,17 @@ void fill_with_maze( TileType * const map_data
                    , const size_t height
                    )
 {
-    const Point grid_size = {width / 2, height / 2};
+    const Point grid_size = { width / 2, height / 2 };
 
-    Dir * grid = malloc(sizeof(Dir) * grid_size.x * grid_size.y);
-    if (grid == NULL) return;
+    Dir * grid = malloc( sizeof( Dir ) * grid_size.x * grid_size.y );
+    if ( grid == NULL ) return;
 
-    for (int i = 0; i < grid_size.x * grid_size.y; i++) {
+    for ( int i = 0; i < grid_size.x * grid_size.y; i++ ) {
         grid[i] = 0;
     }
     
-    fill_grid  (grid, grid_size.x, grid_size.y, map_data, width, height);
-    
-    render_maze(grid, grid_size.x, grid_size.y, map_data, width, height);
+    fill_grid  ( grid, grid_size.x, grid_size.y, map_data, width, height );
+    render_maze( grid, grid_size.x, grid_size.y, map_data, width, height );
 }
 
 static void fill_grid( Dir * const grid

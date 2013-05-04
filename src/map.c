@@ -1,4 +1,8 @@
 #include "map.h"
+#include "entity.h"
+
+#include "map/generator.h"
+#include "map/levels.h"
 
 extern void set_tile( Map * const map
                     , const TileType t
@@ -39,4 +43,36 @@ extern void substitute_tiles( Map * const map
         }
     }
 #undef AT
+}
+
+extern void delete_map_data( Map * const map )
+{
+    if ( map->flags & MAP_DYNAMIC ) {
+        free( map->data );
+    }
+
+    free( map->inital_enemy_states );
+
+    map->data = NULL;
+    map->width = map->height = 0;
+    map->flags = 0;
+    map->enemies_count = 0;
+}
+
+extern void change_level( Map * const map, const int level )
+{
+    map->width  = 17;
+    map->height = 17;
+    const size_t map_size = map->width * map->height;
+
+    if (level % ( RANDOM_BETWEEN_COUNT + 1 ) == 1 ) {
+        map->flags = 0;
+        map->data = pick_nonrandom(level);
+    } else {
+        map->flags = MAP_DYNAMIC;
+        map->data = malloc(sizeof(TileType) * map_size);
+        if ( map->data == NULL ) return;
+        fill_with_maze( map->data, map->width, map->height );
+    }
+    find_enemies( map );
 }

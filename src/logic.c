@@ -1,6 +1,5 @@
 #include <SDL/SDL.h>
 #include "logic.h"
-#include "levels.h"
 #include "state.h"
 #include "map.h"
 
@@ -237,7 +236,8 @@ extern State *update_free( State * const state
     }
 
     if (player_entity->position.x == state->map.width - 1) {
-        change_level(state, assets, state->current_level_no + 1);
+        state->current_level_no += 1;
+        change_level( & state->map, state->current_level_no );
         player_entity->position.x = 0;
         player_entity->destination 
             = player_entity->previous_position = player_entity->position;
