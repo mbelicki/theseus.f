@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 
 #include "types.h"
+#include "state.h"
 #include "create.h"
 #include "draw.h"
 #include "levels.h"
@@ -18,7 +19,7 @@ typedef struct _StateBehavior {
     void (*draw)(const State *state, SDL_Surface *screen, const Assets *assets);
 } StateBehavior;
 
-static StateBehavior behaviors[STATE_MAX + 1];
+static StateBehavior behaviors[ STATE_COUNT ];
 
 static StateBehavior *get_behavior_table()
 {
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
     change_level(state, assets, 0);
     StateBehavior *behaviors = get_behavior_table();
 
-    while (is_not_done(state)) {
+    while ( is_not_done( state ) ) {
         int old_keys = keys;
         int new_keys = get_keyboard();
         
@@ -99,7 +100,7 @@ int main(int argc, char **argv)
 int is_not_done(const State * const state)
 {
     SDL_Event event = {0};
-    SDL_PollEvent(&event);
+    SDL_PollEvent( & event );
     return event.type != SDL_QUIT && state->requested_quit == 0;
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "state.h"
 
 int is_marquee_on(const State * const state);
 void handle_marquee(State * const state, const double time);

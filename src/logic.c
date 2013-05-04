@@ -1,58 +1,8 @@
 #include <SDL/SDL.h>
 #include "logic.h"
 #include "levels.h"
-
-static void set_tile( Map * const map
-                    , const TileType t
-                    , const Point p
-                    )
-{
-    if ( 0 > p.x || 0 > p.y )
-        return;
-    else if ( map->width <= p.x || map->height <= p.y )
-        return;
-
-    map->data[ p.x + map->width * p.y ] = t;
-}
-
-static TileType tile_at( const Map * const map
-                       , const Point p
-                       )
-{
-    if ( 0 > p.x || 0 > p.y )
-        return 0;
-    else if ( map->width <= p.x || map->height <= p.y )
-        return 0;
-
-    return map->data[ p.x + map->width * p.y ];
-}
-
-static int has_neighboring( const Map * const map
-                          , const TileType t
-                          , const Point p
-                          )
-{
-    Point temp = p;
-    TileType sum = 0;
-    
-    temp.x = p.x - 1;
-    temp.y = p.y;
-    sum |= tile_at( map, temp );
-
-    temp.x = p.x + 1;
-    temp.y = p.y;
-    sum |= tile_at( map, temp );
-
-    temp.x = p.x;
-    temp.y = p.y - 1;
-    sum |= tile_at( map, temp );
-
-    temp.x = p.x;
-    temp.y = p.y + 1;
-    sum |= tile_at( map, temp );
-
-    return (sum & t) != 0;
-}
+#include "state.h"
+#include "map.h"
 
 static TileType destination_tile(const State * const state)
 {
@@ -85,18 +35,9 @@ static inline void reset_player_position(State * const state)
     init_entity( & ENTITY_IN( state->player ), 0, state->map.height / 2);
 }
 
-static void clean_map(State * const state)
+static void clean_map(Map * const map)
 {
-#define AT(x, y) \
-    (state->map.data[(x) + state->map.width * (y)])
-
-    for (int i = 0; i < state->map.width; i++) {
-        for (int j = 0; j < state->map.height; j++) {
-            if (AT(i, j) == TILE_STRING)
-                AT(i, j) = TILE_FLOOR;
-        }
-    }
-#undef AT
+    substitute_tiles( map, TILE_STRING, TILE_FLOOR );
 }
 
 static void change_state(State * const state, const StateType next)
@@ -107,9 +48,9 @@ static void change_state(State * const state, const StateType next)
 
 static void die(State * const state)
 {
-    change_state(state, STATE_LOST);
-    reset_player_position(state);
-    clean_map(state);
+    change_state( state, STATE_LOST );
+    reset_player_position( state );
+    clean_map( & state->map );
 }
 
 extern int is_marquee_on(const State * const state)
@@ -184,57 +125,6 @@ extern State *process_splash( State *state
     return state;
 }
 
-static int is_moving( const Entity * const entity )
-{
-    return entity->movement_delta > 0.0;
-}
-
-static void cancel_move( Entity * const entity )
-{
-      entity->destination = entity->position;
-      entity->movement_delta = 0.0;
-}
-
-static void complete_move( Entity * const entity )
-{
-      entity->previous_position = entity->position;
-      entity->position = entity->destination;
-      entity->movement_delta = 0.0;
-}
-
-static TileType update_entity( Entity * const entity
-                             , const State * const state
-                             , const TileType non_walkable
-                             , const double time
-                             )
-{
-    const TileType dest_tile = tile_at( & state->map
-                                      , entity->destination
-                                      );
-    
-    int is_destination_reached = POINT_EQ( entity->destination
-                                         , entity->position
-                                         );
-    if ( entity->movement_delta <= 0.0 
-         && is_destination_reached == 0) 
-    {
-        entity->movement_delta = 1.0;
-    }
-
-    if ( is_moving( entity ) ) {
-        if ( dest_tile & non_walkable ) {
-            cancel_move( entity );
-            entity->flags |= ENTITY_HAS_HIT_WALL;
-        } else {
-            entity->movement_delta -= entity->speed * time;
-            if ( entity->movement_delta <= 0.0 ) {
-                complete_move( entity );
-            }
-        }
-    }
-
-    return dest_tile;
-}
 
 extern State *process_free( State * const state
                           , const int new_keys
@@ -314,7 +204,7 @@ static void update_enemy( Enemy * const enemy
     }
     /* do the walking */
     const TileType non_walkable = TILE_WALL | TILE_STRING | TILE_TRAP;
-    update_entity( & ENTITY_OF( enemy ), state, non_walkable, time );
+    update_entity( & ENTITY_OF( enemy ), & state->map, non_walkable, time );
     /* handle wall hit */
     if ( ENTITY_OF( enemy ).flags & ENTITY_HAS_HIT_WALL ) {
         if ( is_going_back ) {
@@ -334,7 +224,7 @@ extern State *update_free( State * const state
     Entity * const player_entity = & ENTITY_IN( state->player );
 
     const TileType non_walkable = TILE_WALL;
-    TileType dst_tile = update_entity( player_entity, state, 
+    TileType dst_tile = update_entity( player_entity, & state->map, 
                                        non_walkable, time );
 
     const int current = current_tile(state);

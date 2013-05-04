@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "state.h"
 
 extern void RepaintProceduralTextures( Assets * const assets
                                      , const SDL_Surface * const screen
