@@ -1,0 +1,16 @@
+theseus.fx.plan
+---------------
+a brief list of things to be done in this project:
+
+[ ] sound
+[ ] loading levels from files
+[ ] more static levels
+[ ] refactor state management
+[ ] a little bit more advanced procedural level generator
+[ ] boulders & pits
+[ ] buttons & doors
+[ ] more complex 'trader' interactions (mini puzzles/riddles, maybe simple
+    conversation scripts)
+[ ] more items, separate ending for each one
+[ ] graphical icons for items
+[ ] juice
