@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "state.h"
+#include "assets.h"
 
 void draw_free( const State * const state
               , SDL_Surface * const screen

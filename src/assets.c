@@ -1,9 +1,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-#include "entity.h"
-#include "create.h"
-#include "map.h"
+#include "assets.h"
 
 SDL_Surface *get_screen( const int width
                        , const int height
@@ -102,7 +100,7 @@ static void fill_player_tex( const SDL_Surface * const context
     }
 }
 
-extern void RepaintProceduralTextures( Assets * const assets
+static void RepaintProceduralTextures( Assets * const assets
                                      , const SDL_Surface * const screen
                                      , const Color wall_color
                                      , const Color floor_color
@@ -159,7 +157,7 @@ extern void RepaintProceduralTextures( Assets * const assets
 }
 
 
-SDL_Surface *load_image(const char * const name)
+static SDL_Surface *load_image( const char * const name )
 {
     SDL_Surface *image = NULL;
     if((image = IMG_Load(name)) == NULL) {
@@ -169,7 +167,7 @@ SDL_Surface *load_image(const char * const name)
     return image;
 }
 
-Assets *load_assets(const SDL_Surface * const screen)
+extern Assets *load_assets( const SDL_Surface * const screen )
 {
     if (screen == NULL) return NULL;
 
@@ -195,10 +193,10 @@ Assets *load_assets(const SDL_Surface * const screen)
     assets->player_tex = textures + 4 * tex_size;
     assets->enemy_tex  = textures + 5 * tex_size;
 
-    assets->image_dangerous = load_image("gfx/dangerous.png");
-    assets->image_trader    = load_image("gfx/trader.png");
-    assets->image_boss      = load_image("gfx/boss.png");
-    assets->image_font      = load_image("gfx/font.png");
+    assets->image_dangerous = load_image( "gfx/dangerous.png" );
+    assets->image_trader    = load_image( "gfx/trader.png" );
+    assets->image_boss      = load_image( "gfx/boss.png" );
+    assets->image_font      = load_image( "gfx/font.png" );
 
     const Color wall_color   = {255,  13,  51, 114};
     const Color floor_color  = {255,  65, 113, 191};
@@ -213,25 +211,3 @@ Assets *load_assets(const SDL_Surface * const screen)
     return assets;
 }
 
-State *create_initial_state()
-{
-    State *state = malloc(sizeof(State));
-    if (state == NULL) return NULL;
-
-    state->type = STATE_SPLASH;
-    state->next_type = state->type;
-
-    state->requested_quit = 0;
-
-    state->marquee_amount = 0.0;
-    state->is_marquee_closing = 0;
-
-    init_player( & state->player, 0, 8 );
-    
-    state->player.item = ITEM_POTATO;
-    state->trader_item = ITEM_SWORD;
-
-    state->map.data = NULL;
-
-    return state;
-}

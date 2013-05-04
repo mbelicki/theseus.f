@@ -3,19 +3,19 @@ CC=gcc
 COMMON_OPTS=-lm -lSDL -lSDL_image -Wall -pedantic -Iinc -std=c99 -O3 -g
 WINDOWS_OPTS=-mwindows
 
-all: create.o draw.o logic.o map.o entity.o src/theseus.c
-	$(CC) src/theseus.c create.o draw.o logic.o entity.o map.o \
+all: assets.o draw.o logic.o map.o entity.o src/theseus.c
+	$(CC) src/theseus.c assets.o draw.o logic.o entity.o map.o \
 			-o theseus $(COMMON_OPTS)
 
-windows: create.o draw.o logic.o map.o entity.o src/theseus.c
-	$(CC) src/theseus.c create.o draw.o logic.o entity.o map.o \
+windows: assets.o draw.o logic.o map.o entity.o src/theseus.c
+	$(CC) src/theseus.c assets.o draw.o logic.o entity.o map.o \
 			-o theseus $(COMMON_OPTS) $(WINDOWS_OPTS)
 
 draw.o: src/draw.c
 	$(CC) src/draw.c -o draw.o -c $(COMMON_OPTS)
 
-create.o: src/create.c
-	$(CC) src/create.c -o create.o -c $(COMMON_OPTS)
+assets.o: src/assets.c
+	$(CC) src/assets.c -o assets.o -c $(COMMON_OPTS)
 
 logic.o: src/logic.c
 	$(CC) src/logic.c -o logic.o -c $(COMMON_OPTS)

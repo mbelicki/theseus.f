@@ -5,6 +5,30 @@
 #include "state.h"
 #include "map.h"
 
+
+extern State *create_initial_state()
+{
+    State *state = malloc(sizeof(State));
+    if (state == NULL) return NULL;
+
+    state->type = STATE_SPLASH;
+    state->next_type = state->type;
+
+    state->requested_quit = 0;
+
+    state->marquee_amount = 0.0;
+    state->is_marquee_closing = 0;
+
+    init_player( & state->player, 0, 8 );
+    
+    state->player.item = ITEM_POTATO;
+    state->trader_item = ITEM_SWORD;
+
+    state->map.data = NULL;
+
+    return state;
+}
+
 static TileType destination_tile(const State * const state)
 {
     const Point dst = ENTITY_IN( state->player ).destination;
@@ -34,13 +58,12 @@ static TileType current_tile(const State * const state)
 static void reset_enemies( State * const state )
 {
     const size_t size = sizeof( Enemy ) * state->map.enemies_count;
-    /* TODO: reallocation is not always neeeded */
-    free( state->enemies );
-    state->enemies = malloc( size );
-    if ( state->enemies == NULL ) return;
-
-    printf( "mam enenmy count is: %lu\n", state->map.enemies_count );
-
+    /* if additional space is needed then realloc */
+    if (state->enemies_count < state->map.enemies_count) {
+        free( state->enemies );
+        state->enemies = malloc( size );
+        if ( state->enemies == NULL ) return;
+    }     
     memcpy( state->enemies, state->map.inital_enemy_states, size );
     state->enemies_count = state->map.enemies_count;
 }
@@ -93,7 +116,7 @@ extern void handle_marquee(State * const state, const double time)
     }
 }
 
-extern State *update_nop(State *state, Assets *assets, double time)
+extern State *update_nop( State * const state, double time )
 {
     /* this procedure was intentionally left blank */
     return state;
@@ -230,7 +253,6 @@ static void update_enemy( Enemy * const enemy
 }
 
 extern State *update_free( State * const state
-                         , Assets * const assets
                          , const double time
                          )
 {

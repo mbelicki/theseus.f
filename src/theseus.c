@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "state.h"
-#include "create.h"
+#include "assets.h"
 #include "draw.h"
 #include "logic.h"
 #include "map.h"
@@ -15,7 +15,7 @@ int is_not_done(const State * const state);
 
 typedef struct _StateBehavior {
     State *(*process)(State *state, int new_keys, int old_keys, double time);
-    State *(*update)(State *state, Assets *assets, double time);
+    State *(*update)(State *state, double time);
     void (*draw)(const State *state, SDL_Surface *screen, const Assets *assets);
 } StateBehavior;
 
@@ -59,8 +59,8 @@ int main(int argc, char **argv)
     unsigned long now  = 0;
     
     State       *state  = create_initial_state();
-    SDL_Surface *screen = get_screen(512, 512, "theseus.f");
-    Assets      *assets = load_assets(screen);
+    SDL_Surface *screen = get_screen( 512, 512, "theseus.f" );
+    Assets      *assets = load_assets( screen );
 
     if (screen == NULL || state == NULL || assets == NULL) {
         exit(1);
@@ -79,11 +79,11 @@ int main(int argc, char **argv)
 
         StateBehavior behav = behaviors[state->type];
         
-        if (is_marquee_on(state)) {
+        if ( is_marquee_on( state ) ) {
             handle_marquee(state, time);
         } else {
             state = behav.process(state, new_keys, old_keys, time);
-            state = behav.update(state, assets, time);
+            state = behav.update(state, time);
         }
         behav.draw(state, screen, assets);
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     exit(0);
 }
 
-int is_not_done(const State * const state)
+int is_not_done( const State * const state )
 {
     SDL_Event event = {0};
     SDL_PollEvent( & event );

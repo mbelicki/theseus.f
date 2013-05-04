@@ -2,12 +2,23 @@
 
 #include "state.h"
 
-int is_marquee_on(const State * const state);
-void handle_marquee(State * const state, const double time);
+extern State *create_initial_state();
 
-State *update_nop(State *state, Assets *assets, double time);
+extern int is_marquee_on( const State * const state );
+extern void handle_marquee( State * const state, const double time );
 
-State *process_splash(State *state, int new_keys, int old_keys, double time);
+extern State *update_nop( State * const state, double time );
+extern State *update_free( State * const state, const double time);
 
-State *process_free(State *state, int new_keys, int old_keys, double time);
-State *update_free(State *state, Assets *assets, double time);
+extern State *process_splash( State * const state
+                            , const int new_keys
+                            , const int old_keys
+                            , const double time
+                            );
+
+extern State *process_free( State * const state
+                          , const int new_keys
+                          , const int old_keys
+                          , const double time
+                          );
+
