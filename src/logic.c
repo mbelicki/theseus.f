@@ -2,20 +2,56 @@
 #include "logic.h"
 #include "levels.h"
 
-static void set_tile( State * const state
+static void set_tile( Map * const map
                     , const TileType t
                     , const Point p
                     )
 {
-    state->map.data[p.x + state->map.width * p.y] = t;
+    if ( 0 > p.x || 0 > p.y )
+        return;
+    else if ( map->width <= p.x || map->height <= p.y )
+        return;
+
+    map->data[ p.x + map->width * p.y ] = t;
 }
 
-static TileType tile_at( const size_t i
-                       , const size_t j
-                       , const State * const state
+static TileType tile_at( const Map * const map
+                       , const Point p
                        )
 {
-    return state->map.data[i + state->map.width * j];
+    if ( 0 > p.x || 0 > p.y )
+        return 0;
+    else if ( map->width <= p.x || map->height <= p.y )
+        return 0;
+
+    return map->data[ p.x + map->width * p.y ];
+}
+
+static int has_neighboring( const Map * const map
+                          , const TileType t
+                          , const Point p
+                          )
+{
+    Point temp = p;
+    TileType sum = 0;
+    
+    temp.x = p.x - 1;
+    temp.y = p.y;
+    sum |= tile_at( map, temp );
+
+    temp.x = p.x + 1;
+    temp.y = p.y;
+    sum |= tile_at( map, temp );
+
+    temp.x = p.x;
+    temp.y = p.y - 1;
+    sum |= tile_at( map, temp );
+
+    temp.x = p.x;
+    temp.y = p.y + 1;
+    sum |= tile_at( map, temp );
+
+    return (sum & t) != 0;
 }
 
 static TileType destination_tile(const State * const state)
@@ -44,14 +80,9 @@ static TileType current_tile(const State * const state)
     return state->map.data[ pos.x + state->map.width * pos.y ];
 }
 
-static void reset_player_position(State * const state) 
+static inline void reset_player_position(State * const state) 
 {
-    const Point start_pos = { 0, state->map.height / 2 };
-
-    ENTITY_IN( state->player ).movement_delta = 0.0;
-    ENTITY_IN( state->player ).position       = start_pos;
-    ENTITY_IN( state->player ).destination    = start_pos;
-    state->player_prev_pos = start_pos;
+    init_entity( & ENTITY_IN( state->player ), 0, state->map.height / 2);
 }
 
 static void clean_map(State * const state)
@@ -123,12 +154,12 @@ extern State *process_splash( State *state
         if ( up_pressed ) {
             state->player.item = state->trader_item;
             state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
-            set_tile( state, TILE_FLOOR, 
+            set_tile( & state->map, TILE_FLOOR, 
                       ENTITY_IN( state->player ).position );
             change_state( state, STATE_FREE );
         } else if ( down_pressed ) {
             state->trader_item = (state->trader_item + 1);// % (MAX_ITEM + 1);
-            set_tile( state, TILE_FLOOR, 
+            set_tile( & state->map, TILE_FLOOR, 
                       ENTITY_IN( state->player ).position );
             change_state( state, STATE_FREE );
         }
@@ -153,6 +184,58 @@ extern State *process_splash( State *state
     return state;
 }
 
+static int is_moving( const Entity * const entity )
+{
+    return entity->movement_delta > 0.0;
+}
+
+static void cancel_move( Entity * const entity )
+{
+      entity->destination = entity->position;
+      entity->movement_delta = 0.0;
+}
+
+static void complete_move( Entity * const entity )
+{
+      entity->previous_position = entity->position;
+      entity->position = entity->destination;
+      entity->movement_delta = 0.0;
+}
+
+static TileType update_entity( Entity * const entity
+                             , const State * const state
+                             , const TileType non_walkable
+                             , const double time
+                             )
+{
+    const TileType dest_tile = tile_at( & state->map
+                                      , entity->destination
+                                      );
+    
+    int is_destination_reached = POINT_EQ( entity->destination
+                                         , entity->position
+                                         );
+    if ( entity->movement_delta <= 0.0 
+         && is_destination_reached == 0) 
+    {
+        entity->movement_delta = 1.0;
+    }
+
+    if ( is_moving( entity ) ) {
+        if ( dest_tile & non_walkable ) {
+            cancel_move( entity );
+            entity->flags |= ENTITY_HAS_HIT_WALL;
+        } else {
+            entity->movement_delta -= entity->speed * time;
+            if ( entity->movement_delta <= 0.0 ) {
+                complete_move( entity );
+            }
+        }
+    }
+
+    return dest_tile;
+}
+
 extern State *process_free( State * const state
                           , const int new_keys
                           , const int old_keys
@@ -160,46 +243,50 @@ extern State *process_free( State * const state
                           )
 {
     Entity * const player_entity = & ENTITY_IN( state->player );
+    int moved = 0;
 
-    if (player_entity->movement_delta == 0.0) {
+    if ( is_moving( player_entity ) == 0 ) {
         if (new_keys & KEY_UP) {
             player_entity->destination.y -= 1;
-            player_entity->movement_delta = 1.0;
+            moved = 1;
         } else if (new_keys & KEY_DOWN) {
             player_entity->destination.y += 1;
-            player_entity->movement_delta = 1.0;
+            moved = 1;
         } else if (new_keys & KEY_LEFT) {
             player_entity->destination.x -= 1;
-            player_entity->movement_delta = 1.0;
+            moved = 1;
         } else if (new_keys & KEY_RIGHT) {
             player_entity->destination.x += 1;
-            player_entity->movement_delta = 1.0;
+            moved = 1;
         }
+    }
 
-        if ( player_entity->movement_delta == 1.0 ) {
-            const int destination = destination_tile(state);
-            const int current     = current_tile(state);
-            const int antydest    = antydestination_tile(state);
+    if ( moved ) {
+        const int destination = destination_tile(state);
+        const int current     = current_tile(state);
+        const int antydest    = antydestination_tile(state);
 
-            if ( ( ! POINT_EQ( player_entity->destination
-                           , state->player_prev_pos) )
-                &&
-                  (destination == TILE_WALL
-                   || (destination  == TILE_STRING 
-                        && antydest == TILE_STRING))
-               ){
+        //const int neighbors_string = has_neighboring( & state->map
+        //                                            , TILE_STRING
+        //                                            , player_entity->position
+        //                                            );
 
-                player_entity->destination = player_entity->position;
-                player_entity->movement_delta = 0.0;
-            } else {
-                if (current == TILE_FLOOR && destination != TILE_STRING) {
-                    set_tile(state, TILE_STRING, 
-                             player_entity->position);
-                } else if (    current     == TILE_STRING 
-                            && destination != TILE_FLOOR) {
-                    set_tile(state, TILE_FLOOR, 
-                             player_entity->position);
-                }
+        if ( ( ! POINT_EQ( player_entity->destination
+                         , player_entity->previous_position
+                         ) )
+             &&
+               ( destination  == TILE_STRING 
+                 && antydest == TILE_STRING ) )
+        {
+            cancel_move( player_entity );
+        } else {
+            if (current == TILE_FLOOR && destination != TILE_STRING) {
+                set_tile( & state->map, TILE_STRING, 
+                          player_entity->position);
+            } else if (    current     == TILE_STRING 
+                        && destination != TILE_FLOOR) {
+                set_tile( & state->map, TILE_FLOOR, 
+                          player_entity->position);
             }
         }
     }
@@ -207,43 +294,6 @@ extern State *process_free( State * const state
     return state;
 }
 
-static int is_moving( const Entity * const entity )
-{
-    return entity->movement_delta > 0.0;
-}
-
-static int update_entity( Entity * const entity
-                         , const State * const state
-                         , const TileType non_walkable
-                         , const double time
-                         )
-{
-    const int dest_tile = tile_at( entity->destination.x 
-                                 , entity->destination.y
-                                 , state
-                                 );
-    
-    if ( entity->movement_delta <= 0.0 
-        && POINT_EQ(entity->destination, entity->position) == 0 ) {
-        entity->movement_delta = 1.0;
-    }
-
-    if ( is_moving(entity) ) {
-        if ( dest_tile & non_walkable ) {
-            entity->movement_delta = 0.0;
-            entity->destination = entity->position;
-            entity->flags |= ENTITY_HAS_HIT_WALL;
-        } else {
-            entity->movement_delta -= entity->speed * time;
-            if ( entity->movement_delta <= 0.0 ) {
-                entity->movement_delta = 0.0;
-                entity->position = entity->destination;
-            }
-        }
-    }
-
-    return dest_tile;
-}
 
 static void update_enemy( Enemy * const enemy
                         , const State * const state
@@ -283,25 +333,9 @@ extern State *update_free( State * const state
 {
     Entity * const player_entity = & ENTITY_IN( state->player );
 
-    if ( POINT_EQ( player_entity->position
-                 , player_entity->destination ) 
-         ) {
-        player_entity->movement_delta = 0.0; 
-    } else {
-        player_entity->movement_delta -= player_entity->speed * time;
-        if (player_entity->movement_delta <= 0.0) {
-            player_entity->movement_delta = 0.0; 
-            state->player_prev_pos = player_entity->position;
-            player_entity->position = player_entity->destination;
-        }
-    }
-
-    if (player_entity->position.x == state->map.width - 1) {
-        change_level(state, assets, state->current_level_no + 1);
-        player_entity->position.x = 0;
-        player_entity->destination 
-            = state->player_prev_pos = player_entity->position;
-    }
+    const TileType non_walkable = TILE_WALL;
+    TileType dst_tile = update_entity( player_entity, state, 
+                                       non_walkable, time );
 
     const int current = current_tile(state);
     if (current == TILE_TRAP) {
@@ -310,6 +344,13 @@ extern State *update_free( State * const state
         change_state(state, STATE_TRADE);
     } else if (current == TILE_BOSS) {
         change_state(state, STATE_BOSS);
+    }
+
+    if (player_entity->position.x == state->map.width - 1) {
+        change_level(state, assets, state->current_level_no + 1);
+        player_entity->position.x = 0;
+        player_entity->destination 
+            = player_entity->previous_position = player_entity->position;
     }
 
     for (int i = 0; i < state->map_enemy_count; i++) {

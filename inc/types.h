@@ -15,15 +15,13 @@ typedef struct _Point {
 #define POINT_EQ(p1, p2)\
     ((p1).x == (p2).x && (p1).y == (p2).y)
 
-#define POINT_EQ(p1, p2)\
-    ((p1).x == (p2).x && (p1).y == (p2).y)
-
 typedef enum _EntityFlags { ENTITY_HAS_HIT_WALL = 1
                           } EntityFlags;
 
 typedef struct _Entity {
     Point       position;
     Point       destination;
+    Point       previous_position;
     double      movement_delta;
     double      speed;
     EntityFlags flags;
@@ -36,6 +34,7 @@ static inline Entity * init_entity( Entity * const e
                                   , const int y) {
     e->position.x = e->destination.x = x; 
     e->position.y = e->destination.y = y; 
+    e->previous_position = e->position;
     e->speed = DEFAULT_SPEED;
     e->movement_delta = 0.0;
     e->flags = 0;
@@ -119,7 +118,6 @@ typedef struct _State {
     int current_level_no;
 
     Player player;
-    Point  player_prev_pos;
 
     Item   trader_item;
 
