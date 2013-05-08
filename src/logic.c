@@ -27,6 +27,16 @@ extern State *create_initial_state()
     return state;
 }
 
+static Boulder * boulder_at(const State * const state, const Point p)
+{
+    for (int i = 0; i < state->boulders_count; i++) {
+        Boulder * boulder = state->boulders + i;
+        int eq = POINT_EQ( boulder->entity.position, p );
+        if ( eq ) return boulder;
+    }
+    return NULL;
+}
+
 static TileType antydestination_tile(const State * const state)
 {
     const Point dst = state->player.entity.destination;
@@ -41,17 +51,27 @@ static TileType antydestination_tile(const State * const state)
     return state->map.data[ x + state->map.width * y ];
 }
 
-static void reset_enemies( State * const state )
+static void reset_entities( State * const state )
 {
-    const size_t size = sizeof( Enemy ) * state->map.enemies_count;
+    const size_t e_size = sizeof( Enemy ) * state->map.enemies_count;
     /* if additional space is needed then realloc */
     if (state->enemies_count < state->map.enemies_count) {
         free( state->enemies );
-        state->enemies = malloc( size );
+        state->enemies = malloc( e_size );
         if ( state->enemies == NULL ) return;
     }     
-    memcpy( state->enemies, state->map.inital_enemy_states, size );
+    memcpy( state->enemies, state->map.inital_enemy_states, e_size );
     state->enemies_count = state->map.enemies_count;
+
+    const size_t b_size = sizeof( Boulder ) * state->map.boulders_count;
+    /* if additional space is needed then realloc */
+    if (state->boulders_count < state->map.boulders_count) {
+        free( state->boulders );
+        state->boulders = malloc( b_size );
+        if ( state->boulders == NULL ) return;
+    }
+    memcpy( state->boulders, state->map.inital_boudler_states, b_size );
+    state->boulders_count = state->map.boulders_count;
 }
 
 static inline void reset_player_position( State * const state ) 
@@ -77,7 +97,7 @@ static void die(State * const state)
 {
     change_state( state, STATE_LOST );
     reset_player_position( state );
-    reset_enemies( state );
+    reset_entities( state );
     clean_map( & state->map );
 }
 
@@ -112,7 +132,6 @@ extern State *update_nop( State * const state, double time )
 extern State *process_splash( State *state
                             , int new_keys
                             , int old_keys
-                            , double time
                             )
 {
     int up_pressed   = old_keys & KEY_UP && (new_keys & KEY_UP) == 0;
@@ -159,7 +178,6 @@ extern State *process_splash( State *state
 extern State *process_free( State * const state
                           , const int new_keys
                           , const int old_keys
-                          , const double time
                           )
 {
     Entity * const player_entity = & state->player.entity;
@@ -206,9 +224,33 @@ extern State *process_free( State * const state
                           player_entity->position);
             }
         }
+
+        Boulder * b = boulder_at( state, player_entity->destination );
+        if ( b != NULL ) {
+            int i = player_entity->destination.x - player_entity->position.x;
+            int j = player_entity->destination.y - player_entity->position.y;
+            Point boulder_dest;
+            boulder_dest.x = player_entity->destination.x + i;
+            boulder_dest.y = player_entity->destination.y + j;
+            TileType boulder_dest_tile = tile_at( & state->map, boulder_dest);
+            if ( boulder_dest_tile == TILE_FLOOR ) {
+                b->entity.destination = boulder_dest;
+            } else {
+                cancel_move( player_entity );
+            }
+        }
     }
     
     return state;
+}
+
+static void swap_enemy_direction( Enemy * const enemy )
+{
+    if ( enemy->flags & ENEMY_GOING_BACK ) {
+        enemy->flags &= ~ENEMY_GOING_BACK;
+    } else {
+        enemy->flags |= ENEMY_GOING_BACK;
+    }
 }
 
 static void update_enemy( Enemy * const enemy
@@ -233,11 +275,7 @@ static void update_enemy( Enemy * const enemy
     update_entity( & enemy->entity, map, non_walkable, time );
     /* handle wall hit */
     if ( enemy->entity.flags & ENTITY_HAS_HIT_WALL ) {
-        if ( is_going_back ) {
-            enemy->flags &= ~ENEMY_GOING_BACK;
-        } else {
-            enemy->flags |= ENEMY_GOING_BACK;
-        }
+        swap_enemy_direction( enemy );
         enemy->entity.flags &= ~ENTITY_HAS_HIT_WALL;
     }
 }
@@ -266,7 +304,7 @@ extern State *update_free( State * const state
 
         clean_map_data( & state-> map );
         change_level( & state->map, state->current_level_no );
-        reset_enemies( state );
+        reset_entities( state );
         
         player_entity->position.x = 0;
         player_entity->destination 
@@ -275,12 +313,23 @@ extern State *update_free( State * const state
 
     for (int i = 0; i < state->enemies_count; i++) {
         Enemy *enemy = state->enemies + i;
-        update_enemy(enemy, & state->map, time);
+        update_enemy( enemy, & state->map, time );
         if ( POINT_EQ( state->player.entity.position
                      , enemy->entity.position
                      ) ) {
             die(state);
         }
+
+        Boulder * b = boulder_at( state, enemy->entity.destination );
+        if ( b != NULL ) {
+            cancel_move( & enemy->entity );
+            swap_enemy_direction( enemy );
+        }
+    }
+
+    for (int i = 0; i < state->boulders_count; i++) {
+        Boulder *boulder = state->boulders + i;
+        update_entity( & boulder->entity, & state->map, 0, time );
     }
         
     return state;

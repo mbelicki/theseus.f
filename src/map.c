@@ -52,13 +52,16 @@ extern void clean_map_data( Map * const map )
     }
 
     free( map->inital_enemy_states );
+    free( map->inital_boudler_states );
 
     map->data = NULL;
     map->inital_enemy_states = NULL;
+    map->inital_boudler_states = NULL;
 
     map->width = map->height = 0;
     map->flags = 0;
     map->enemies_count = 0;
+    map->boulders_count = 0;
 }
 
 extern void change_level( Map * const map, const int level )
@@ -76,5 +79,5 @@ extern void change_level( Map * const map, const int level )
         if ( map->data == NULL ) return;
         fill_with_maze( map->data, map->width, map->height );
     }
-    find_enemies( map );
+    find_entities( map );
 }

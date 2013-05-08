@@ -5,6 +5,7 @@
 /* forward type declarations */
 struct _Point;
 struct _Enemy;
+struct _Boulder;
 
 
 typedef enum _TileType { TILE_FLOOR  =  0
@@ -28,6 +29,9 @@ typedef struct _Map {
 
     struct _Enemy *inital_enemy_states;
     size_t enemies_count;
+
+    struct _Boulder *inital_boudler_states;
+    size_t boulders_count;
 } Map;
 
 extern void set_tile( Map * const map

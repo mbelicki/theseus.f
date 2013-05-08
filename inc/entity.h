@@ -41,6 +41,10 @@ typedef struct _Player {
     Item   item;
 } Player;
 
+typedef struct _Boulder {
+    Entity entity;
+} Boulder;
+
 #define PLAYER_SPEED 7.0
 
 /* functions: */
@@ -60,6 +64,11 @@ extern Player * init_player( Player * const p
                            , const int x
                            , const int y
                            );
+
+extern Boulder * init_boulder( Boulder * const b
+                             , const int x
+                             , const int y
+                             );
 
 extern int is_moving( const Entity * const entity );
 extern void cancel_move( Entity * const entity );

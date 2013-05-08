@@ -13,12 +13,10 @@ extern State *update_free( State * const state, const double time);
 extern State *process_splash( State * const state
                             , const int new_keys
                             , const int old_keys
-                            , const double time
                             );
 
 extern State *process_free( State * const state
                           , const int new_keys
                           , const int old_keys
-                          , const double time
                           );
 

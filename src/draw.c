@@ -3,6 +3,33 @@
 
 #include "draw.h"
 
+static void draw_boulder( Boulder * const boulder
+                        , SDL_Surface * const screen
+                        , const Assets * const assets
+                        , const Point tile_size
+                        )
+{
+    const int off_x = tile_size.x / 2;
+    const int off_y = tile_size.y / 2;
+
+    const Point position    = boulder->entity.position;
+    const Point destination = boulder->entity.destination;
+    const double delta = (1 - boulder->entity.movement_delta);
+    const int boulder_i
+        = (int)(tile_size.x * (position.x 
+                                + delta * (destination.x - position.x)));
+    const int boulder_j
+        = (int)(tile_size.y * (position.y 
+                                + delta * (destination.y - position.y)));
+  
+    SDL_Rect src = {320, 216, 32, 32};
+    SDL_Rect dst = {boulder_i - off_x, boulder_j - off_y, 32, 32};
+    
+    SDL_UnlockSurface(screen);
+    SDL_BlitSurface(assets->image_font, &src, screen, &dst);
+    SDL_LockSurface(screen);
+}
+
 static void draw_enemy( Enemy * const enemy
                       , SDL_Surface * const screen
                       , const Assets * const assets
@@ -41,7 +68,6 @@ static void draw_enemy( Enemy * const enemy
     SDL_BlitSurface(assets->image_font, &src, screen, &dst);
     SDL_LockSurface(screen);
 #endif
-
 }
 
 static void draw_player( const Player * const player
@@ -279,6 +305,10 @@ extern void draw_free( const State * const state
 
     for (int i = 0; i < state->enemies_count; i++) {
         draw_enemy(&state->enemies[i], screen, assets, tile_size);
+    }
+
+    for (int i = 0; i < state->boulders_count; i++) {
+        draw_boulder(&state->boulders[i], screen, assets, tile_size);
     }
 
     handle_marquee(state, screen, assets);

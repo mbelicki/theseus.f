@@ -13,7 +13,7 @@ int get_keyboard(void);
 int is_not_done(const State * const state);
 
 typedef struct _StateBehavior {
-    State *(*process)(State *state, int new_keys, int old_keys, double time);
+    State *(*process)(State *state, int new_keys, int old_keys);
     State *(*update)(State *state, double time);
     void (*draw)(const State *state, SDL_Surface *screen, const Assets *assets);
 } StateBehavior;
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
         if ( is_marquee_on( state ) ) {
             handle_marquee(state, time);
         } else {
-            state = behav.process(state, new_keys, old_keys, time);
+            state = behav.process(state, new_keys, old_keys);
             state = behav.update(state, time);
         }
         behav.draw(state, screen, assets);

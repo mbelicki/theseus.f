@@ -24,6 +24,9 @@ typedef struct _State {
     Enemy    *enemies;
     size_t    enemies_count;
 
+    Boulder  *boulders;
+    size_t    boulders_count;
+
     int current_level_no;
 
     Player player;

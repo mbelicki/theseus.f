@@ -32,6 +32,14 @@ extern Player * init_player( Player * const p
     return p;
 }
 
+extern Boulder * init_boulder( Boulder * const b
+                             , const int x
+                             , const int y
+                             ) {
+    init_entity( & b->entity, x, y, PLAYER_SPEED );
+    return b;
+}
+
 extern int is_moving( const Entity * const entity )
 {
     return entity->movement_delta > 0.0;
